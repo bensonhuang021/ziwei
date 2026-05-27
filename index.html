@@ -24,9 +24,6 @@
   <!-- ── 導航 ── -->
   <nav class="main-nav">
     <button class="nav-btn" data-sec="home"     onclick="showSection('home')">首頁</button>
-    <button class="nav-btn" data-sec="tarot"    onclick="showSection('tarot')">🃏 塔羅占卜</button>
-    <button class="nav-btn" data-sec="ziwei"    onclick="showSection('ziwei')">☯ 紫微排盤</button>
-    <button class="nav-btn" data-sec="combined" onclick="showSection('combined')">✦ 綜合解讀</button>
     <button class="nav-btn" data-sec="question" onclick="showSection('question')">🔮 占卜解讀</button>
   </nav>
 
@@ -155,6 +152,7 @@
           <div class="form-group">
             <label class="form-label">出生時辰</label>
             <select id="ziwei-hour" class="form-select">
+              <option value="-1">不清楚時辰</option>
               <option value="0">子時 (23:00-01:00)</option>
               <option value="1">丑時 (01:00-03:00)</option>
               <option value="2">寅時 (03:00-05:00)</option>
@@ -220,6 +218,11 @@
         <div class="panel">
           <div class="panel-title">命宮解析</div>
           <div id="ming-reading"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">未來半年運勢分析</div>
+          <div id="future-fortune"></div>
         </div>
 
       </div>
@@ -292,6 +295,7 @@
             <div class="bf-row">
               <label class="bf-label">出生時辰</label>
               <select id="bf-hour" class="form-select">
+                <option value="-1">不清楚時辰</option>
                 <option value="0">子時 (23:00–01:00)</option>
                 <option value="1">丑時 (01:00–03:00)</option>
                 <option value="2">寅時 (03:00–05:00)</option>
@@ -394,6 +398,7 @@
               <div id="new-ziwei-grid" class="ziwei-grid"></div>
             </div>
             <div id="new-ming-summary"></div>
+            <div id="new-future-fortune"></div>
           </div>
         </div>
 

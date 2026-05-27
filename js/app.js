@@ -438,11 +438,13 @@ function initZiwei() {
 }
 
 function calcZiwei() {
-  const year   = parseInt(document.getElementById('ziwei-year').value);
-  const month  = parseInt(document.getElementById('ziwei-month').value);
-  const day    = parseInt(document.getElementById('ziwei-day').value);
-  const hour   = parseInt(document.getElementById('ziwei-hour').value);
-  const gender = document.getElementById('ziwei-gender').value;
+  const year    = parseInt(document.getElementById('ziwei-year').value);
+  const month   = parseInt(document.getElementById('ziwei-month').value);
+  const day     = parseInt(document.getElementById('ziwei-day').value);
+  const hourRaw = parseInt(document.getElementById('ziwei-hour').value);
+  const hour    = hourRaw < 0 ? 6 : hourRaw;
+  const hourUnknown = hourRaw < 0;
+  const gender  = document.getElementById('ziwei-gender').value;
 
   // 基本驗證
   if (!year || !month || !day) {
@@ -453,6 +455,7 @@ function calcZiwei() {
   try {
     const result = ZW.calculate(year, month, day, hour, gender);
     STATE.ziwei.result = result;
+    STATE.ziwei.hourUnknown = hourUnknown;
     renderZiweiChart(result);
     document.getElementById('ziwei-result').style.display = 'block';
   } catch (err) {
@@ -575,7 +578,11 @@ function renderZiweiChart(r) {
   grid.appendChild(center);
 
   // 命宮解讀
+  const hourUnknownNote = STATE.ziwei.hourUnknown
+    ? '<p class="hour-unknown-note">⚠️ 時辰不詳，以<strong>午時</strong>估算，命宮等時辰相關宮位可能略有誤差。</p>'
+    : '';
   document.getElementById('ming-reading').innerHTML = `
+    ${hourUnknownNote}
     <h4>命宮解讀</h4>
     <p>${r.mingReading}</p>
     <h4>四化</h4>
@@ -585,6 +592,9 @@ function renderZiweiChart(r) {
       ).join('')}
     </div>
   `;
+
+  // 未來半年運勢
+  document.getElementById('future-fortune').innerHTML = generateFutureFortune(r);
 }
 
 function showPalaceDetail(palace, result) {
@@ -670,10 +680,12 @@ function flowStep1Next() {
     alert('請輸入 1920–2010 之間的出生年份');
     return;
   }
+  const hourRaw = +document.getElementById('bf-hour').value;
   FLOW.birth = {
     year, month: +document.getElementById('bf-month').value,
     day: +document.getElementById('bf-day').value,
-    hour: +document.getElementById('bf-hour').value,
+    hour: hourRaw < 0 ? 6 : hourRaw,
+    hourUnknown: hourRaw < 0,
     gender: document.getElementById('bf-gender').value,
   };
   flowGoStep(2);
@@ -764,9 +776,10 @@ async function startFlowResults() {
   const BRANCHES = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
   const CAT_LABELS = { love:'💕 感情', career:'💼 事業', money:'💰 財運', health:'🌿 健康', study:'📚 學業', other:'🔮 其他' };
 
+  const hourLabel = FLOW.birth.hourUnknown ? '時辰不詳（以午時計）' : BRANCHES[hour] + '時';
   document.getElementById('result-birth-summary').innerHTML = `
     <div class="result-birth-tag">
-      ${year} 年 ${month} 月 ${day} 日 · ${BRANCHES[hour]}時
+      ${year} 年 ${month} 月 ${day} 日 · ${hourLabel}
       · <span class="q-cat-badge">${CAT_LABELS[FLOW.qCat]||''}</span>
     </div>
     ${FLOW.qText ? `<div class="result-q-text">「${FLOW.qText}」</div>` : ''}`;
@@ -813,13 +826,18 @@ function renderFlowZiwei() {
     FLOW.ziweiResult = ZW.calculate(lunarYear, lunarMonth, lunarDay, FLOW.birth.hour, FLOW.birth.gender);
     const r = FLOW.ziweiResult;
     renderZiweiGridTo(document.getElementById('new-ziwei-grid'), r);
+    const hourUnknownHtml = FLOW.birth.hourUnknown
+      ? '<p class="hour-unknown-note" style="margin-top:.6rem">⚠️ 時辰不詳，以午時估算，命宮等宮位可能略有誤差。</p>'
+      : '';
     document.getElementById('new-ming-summary').innerHTML = `
       <div class="ziwei-summary" style="margin-top:.8rem">
         <div class="summary-item"><div class="summary-label">農曆年</div><div class="summary-value">${r.yearGanzhi}（${r.zodiac}）</div></div>
         <div class="summary-item"><div class="summary-label">命宮</div><div class="summary-value">${r.mingStem}${r.mingBranch}</div></div>
         <div class="summary-item"><div class="summary-label">五行局</div><div class="summary-value">${r.juName}</div></div>
         <div class="summary-item"><div class="summary-label">命主星</div><div class="summary-value">${r.mingMainStar||'空宮'}</div></div>
-      </div>`;
+      </div>${hourUnknownHtml}`;
+    const futureEl = document.getElementById('new-future-fortune');
+    if (futureEl) futureEl.innerHTML = generateFutureFortune(r);
     const sec = document.getElementById('new-ziwei-section');
     sec.style.cssText = 'display:block; opacity:0; transition:opacity 1.2s';
     requestAnimationFrame(() => requestAnimationFrame(() => { sec.style.opacity = '1'; }));
@@ -924,18 +942,17 @@ function renderFlowReading() {
   requestAnimationFrame(() => requestAnimationFrame(() => { el.style.opacity = '1'; }));
 }
 
-// 針對問題，將三張牌織成一段連貫的解讀
+// 針對問題，將三張牌織成一段連貫的解讀（白話、貼近生活、聚焦問題）
 function buildNarrative(cards, origCards, zr) {
   const qText  = FLOW.qText;
   const qCat   = FLOW.qCat;
-  const spread = SPREADS.three;
 
   const CAT_SUBJECT = {
     love: '感情', career: '事業', money: '財運',
-    health: '健康', study: '學業', other: '所詢之事',
+    health: '健康', study: '學業', other: '你問的這件事',
   };
-  const subject = CAT_SUBJECT[qCat] || '所詢之事';
-  const qRef = qText ? `「${qText}」` : `你關於${subject}的疑問`;
+  const subject = CAT_SUBJECT[qCat] || '你問的這件事';
+  const qRef = qText ? `「${qText}」` : `你的${subject}問題`;
 
   const rev  = cards.map(c => c.isRev);
   const orig = origCards;
@@ -945,108 +962,314 @@ function buildNarrative(cards, origCards, zr) {
 
   const paras = [];
 
-  // ── 段落一：過去牌 × 問題的背景根源 ──
+  // ── 段落一：過去牌 × 問題背景 ──
   {
-    let p = `針對${qRef}，牌陣首先從「過去」的角度切入。`;
-    p += `出現在此位置的「${nm[0]}」`;
+    let p = `先來看${qRef}的背景。「${nm[0]}」出現在過去的位置，`;
     if (rev[0]) {
-      p += `以逆位示現——${m[0]}`;
+      p += `而且是逆位。這張牌想告訴你的是：${m[0]}`;
       if (!p.endsWith('。')) p += '。';
-      p += `這說明在${subject}上，你可能長期背負著某些尚未化解的能量，`
-         + `「${kw[0][0]}」的課題以受阻的形式出現，構成了你今日對此事感到糾結或困惑的深層背景。`
-         + `值得先誠實檢視：這份阻礙究竟來自外在環境，還是自己內心未曾正視的部分？`;
+      p += `簡單來說，在${subject}這件事上，過去可能有些地方沒有做到位，或者有些決定做了之後留下了遺憾。`;
+      p += `「${kw[0][0]}」這個能量雖然你有，但當時沒有辦法完全發揮出來。`;
+      p += `先誠實面對這一點，才能讓接下來的方向更清楚。`;
     } else {
-      p += `以正位呈現——${m[0]}`;
+      p += `是正位，代表${m[0]}`;
       if (!p.endsWith('。')) p += '。';
-      p += `這顯示你在${subject}上並非毫無準備——「${kw[0][0]}」的底蘊早已存在，`
-         + `你所走過的歷程，正是今日面對這個問題時最重要的資本。`;
+      p += `說白話就是：在${subject}這件事上，你過去其實有打好一定的基礎。`;
+      p += `「${kw[0][0]}」這個特質已經在你身上了，不要小看自己走過的路，那些都是你今天面對這個問題的底氣。`;
     }
     paras.push(p);
   }
 
-  // ── 段落二：現在牌 × 當前核心與建議 ──
+  // ── 段落二：現在牌 × 當前狀況與建議 ──
   {
-    let p = `來到「現在」這個位置，「${nm[1]}」揭示了你此刻在${subject}上的核心狀態：${m[1]}`;
+    let p = `再看現在的狀況。「${nm[1]}」告訴我們：${m[1]}`;
     if (!p.endsWith('。')) p += '。';
     if (rev[1]) {
-      p += `逆位的「${nm[1]}」暗示著，儘管你內心已感受到「${kw[1][0]}」的能量，但它目前仍以壓抑或未完全展開的形式存在。`
-         + `這張牌的建議是：先停下向外索求答案的腳步，向內整合那些還沒有理清的情緒或想法，`
-         + `等到內在的聲音變得清晰，行動才會真正有效。`;
+      p += `逆位的「${nm[1]}」說明你現在在${subject}上感覺有點卡，可能是方向不夠清晰，或者心裡有些糾結沒有解開。`;
+      p += `這個時候最好的做法，不是繼續硬撐，而是先停下來想清楚問題出在哪。`;
+      p += `把心裡那些亂的東西整理一遍，再決定下一步，這樣走起來才紮實。`;
     } else {
-      p += `這是一張鼓勵你的牌——「${kw[1][0]}」的能量正在你身上流動，你在${subject}上所需要的判斷力與行動力此刻都已到位。`
-         + `這張牌提醒你：與其再等待，不如相信自己當下所感受到的直覺，那就是你最好的指引。`;
+      p += `「${nm[1]}」正位給你的是一個正面的訊號——「${kw[1][0]}」的能量現在正在你身上，`;
+      p += `你在${subject}這件事上其實具備了行動的條件。`;
+      p += `不要再猶豫了，相信你目前的判斷，有時候想太多反而會錯過時機。`;
     }
     paras.push(p);
   }
 
-  // ── 段落三：未來牌 × 走向與結果 ──
+  // ── 段落三：未來牌 × 走向與實用建議 ──
   {
-    let p = `關於${subject}接下來的走向，「${nm[2]}」（未來位）給出了這樣的預示：${m[2]}`;
+    let p = `最重要的，來看${subject}接下來的走向。「${nm[2]}」這張牌說：${m[2]}`;
     if (!p.endsWith('。')) p += '。';
     if (rev[2]) {
-      p += `這張逆位的結果牌是一個善意的警示——如果你繼續沿著目前的軌跡前行，${subject}的結果可能不如預期。`
-         + `但請記得，塔羅牌展示的是「當下能量延伸下去的可能性」，而非不可改變的命運。`
-         + `「${kw[2][0]}」的逆位在提醒你：現在做出調整，仍然來得及為未來寫下不同的劇本。`;
+      p += `\n接下來這段時間需要多注意——逆位的「${nm[2]}」是在提醒你，如果照目前這樣走下去，${subject}的結果可能不太理想。`;
+      if (qCat === 'money') {
+        p += `理財或投資方面，這段時間先不要做高風險的操作，設好停損點，保住本金比追求獲利更重要。沒有完全把握的機會，先觀望就好。`;
+      } else if (qCat === 'love') {
+        p += `感情上，不要急著要一個結果，強求往往適得其反。給對方和自己多一點空間，事情反而容易往好的方向走。`;
+      } else if (qCat === 'career') {
+        p += `事業上，先避免做出換工作或大幅改變方向的決定，目前低調穩住比冒進更安全。`;
+      } else if (qCat === 'health') {
+        p += `身體方面要格外注意，不舒服不要拖，及早處理比較好。`;
+      } else {
+        p += `建議先放慢腳步，多觀察一陣子，等時機更明朗了再做決定。`;
+      }
     } else {
-      p += `這是一個令人期待的訊號。只要你能把握住前兩張牌所指引的方向，${subject}的發展將朝著「${kw[2][0]}」的正向能量前行。`
-         + `未來不是等來的，它正以你此刻的每一個選擇為磚瓦，一點一點成形。`;
+      p += `\n這是一個可以樂觀看待的訊號！「${kw[2][0]}」的正向能量往你這個方向來了。`;
+      if (qCat === 'money') {
+        p += `財運方面，接下來有機會把握到一些不錯的理財機會。方向對了就去做，但記得穩健為主，不要因為看好就忽略了風險控管。`;
+      } else if (qCat === 'love') {
+        p += `感情上，可以主動一點，對方的回應很可能比你預期的還要正面。`;
+      } else if (qCat === 'career') {
+        p += `工作上有不錯的發展機會在前面，現在的努力接下來會有回報，繼續保持。`;
+      } else if (qCat === 'health') {
+        p += `健康狀況在往好的方向走，只要維持現有的好習慣，身體會給你正面的回饋。`;
+      } else {
+        p += `接下來的發展比你想的要好，放膽去做，時機對了。`;
+      }
     }
     paras.push(p);
   }
 
-  // ── 段落四：紫微命盤融入 ──
+  // ── 段落四：紫微命盤 × 問題宮位分析 ──
   if (zr) {
     const CAT_PALACE = { love:'夫妻', career:'官祿', money:'財帛', health:'疾厄', study:'官祿', other:'命宮' };
-    const palaceName  = CAT_PALACE[qCat] || '命宮';
-    const palace      = zr.palaces.find(p => p.name === palaceName);
-    const mingPalace  = zr.palaces.find(p => p.isMing) || zr.palaces[0];
-    const mingStars   = mingPalace.stars.length ? mingPalace.stars.join('、') : '空宮';
-    const revCount    = cards.filter(c => c.isRev).length;
-    const majorCount  = cards.filter(c => c.arcana === 'major').length;
-    const majorNames  = cards.filter(c => c.arcana === 'major')
-                            .map(c => TAROT_CARDS.find(o => o.id === c.id).name).join('、');
+    const palaceName = CAT_PALACE[qCat] || '命宮';
+    const palace     = zr.palaces.find(p => p.name === palaceName);
+    const mingPalace = zr.palaces.find(p => p.isMing) || zr.palaces[0];
+    const mingStars  = mingPalace.stars.length ? mingPalace.stars.join('、') : '空宮';
+    const revCount   = cards.filter(c => c.isRev).length;
 
-    let p = `將塔羅牌的訊息與你的紫微命盤相互印證，可以看到更完整的圖景。`;
-    p += `你的命宮主星為「${mingStars}」，${zr.juName}格局——${zr.mingReading}`;
+    let p = `再從你的紫微命盤來看，命宮主星是「${mingStars}」（${zr.juName}）。${zr.mingReading}`;
     if (!p.endsWith('。')) p += '。';
 
     if (palace && palace.name !== '命宮') {
-      const palStars = palace.stars.length ? palace.stars.join('、') : '空宮（借對宮力量解讀）';
-      p += `而與${subject}最直接相關的${palaceName}宮（${palace.stem}${palace.branch}）坐有「${palStars}」`;
+      const palStars = palace.stars.length ? palace.stars.join('、') : '空宮（借對宮力量）';
+      p += `\n跟${subject}最直接相關的宮位是你的${palaceName}（${palace.stem}${palace.branch}），坐有「${palStars}」`;
       if (palace.hua && palace.hua.length) {
-        p += `，逢${palace.hua.map(h => `${h.star}${h.hua}`).join('、')}`;
+        p += `，其中有${palace.hua.map(h => `${h.star}${h.hua}`).join('、')}`;
       }
       p += `。`;
-    }
 
-    if (majorCount > 0) {
-      p += `此次出現 ${majorCount} 張大阿爾克那（${majorNames}），顯示這個問題對你而言不只是日常小事，而是牽動更深層人生走向的重要課題。`;
+      // 針對理財問題加入星曜具體說明
+      if (qCat === 'money' && palace.stars[0]) {
+        const MONEY_STAR_TIPS = {
+          '武曲': '武曲坐財帛是強財星，本命就有賺錢的能力，方向找對了就容易有成果，可以樂觀看待財運。',
+          '天府': '天府坐財帛，理財穩健保守，不容易大起大落，是相對安全的格局，適合做長期穩健的投資。',
+          '太陰': '太陰入財帛，財運與感情、家庭有連結，有時財運來自意想不到的人際關係，需要多注意資金流向。',
+          '廉貞': '廉貞坐財帛，財富起伏可能較明顯，適合有衝勁的投資，但也要注意不能太衝，要設好風控。',
+          '破軍': '破軍坐財帛，財來財去的格局，錢容易進來也容易花掉，需要多注意理財紀律，避免有錢就亂花。',
+          '七殺': '七殺入財帛，財富靠自己打拼，需要付出比別人多的努力，但成就感很高，適合主動出擊的理財方式。',
+          '貪狼': '貪狼坐財帛，多方面都有財路，有時投資機會來自朋友或社交圈，可以多留意身邊的資訊。',
+          '紫微': '紫微坐財帛，財運格局不低，有機會積累財富，但要注意不要因過於自信而忽略潛在風險。',
+          '巨門': '巨門入財帛，財運上需要靠口才或溝通能力帶財，可能有一些關於錢的糾紛要多注意。',
+          '天同': '天同坐財帛，財運溫和穩定，不大起大落，適合穩健理財，不要為了更高報酬去冒不必要的風險。',
+          '天機': '天機坐財帛，財運多變動，適合靈活操作的投資方式，但也容易因想太多而錯失機會，需要多注意執行力。',
+          '天梁': '天梁入財帛，常有貴人助財，也可能靠公益或助人的工作帶來財路，保守理財比較適合這個格局。',
+          '天相': '天相坐財帛，財運穩定，有貴人相助，合作型的財路對你較為有利。',
+          '太陽': '太陽入財帛，財運與事業、名聲連結，事業有成財運自然跟上，可以樂觀看待未來的財運發展。',
+        };
+        const tip = MONEY_STAR_TIPS[palace.stars[0]];
+        if (tip) p += tip;
+      }
     }
 
     if (revCount >= 2) {
-      p += `命盤與多張逆位牌同時發出「需要調整」的訊號——這不是壞消息，而是命運在告訴你：此刻最有力量的行動，是向內沉澱，而非向外強攻。當你整理好自己，外在的${subject}局面自然會跟著鬆動。`;
+      p += `\n命盤加上牌陣，都提醒你這段時間在${subject}上需要多注意，先保守一點、減少冒險，穩住現有的基礎比積極擴張更重要。`;
     } else if (revCount === 0) {
-      p += `命盤的能量格局與全正位的塔羅牌彼此呼應，顯示你在${subject}上正處於難得的順風期——天時、地利都已就位，你所需要的，只是願意踏出那一步的勇氣。`;
+      p += `\n命盤和塔羅牌都指向正向，這是一個難得的好時機，可以樂觀看待${subject}接下來的發展，把握住就好。`;
     } else {
-      p += `命盤與牌陣的訊息都指向同一個核心：${subject}這件事，需要你同時照顧「外在的行動」與「內在的調整」，兩者缺一不可，才能走出真正穩健的路。`;
+      p += `\n命盤和牌陣的訊息提醒你，${subject}這件事要同時顧到行動和心態調整，兩個都做好，結果才會理想。`;
     }
     paras.push(p);
   }
 
-  // ── 結語 ──
+  // ── 結語（針對問題類型）──
   {
     const CAT_CLOSING = {
-      love:    `感情從來沒有標準答案。牌陣為你勾勒出了能量的輪廓，但讓關係真正成長的，是你願意拿出多少真誠與勇氣去面對它——對對方，更對自己。`,
-      career:  `事業的藍圖已在牌陣中若隱若現。你所缺少的，也許不是能力，而是對自己多一份篤定的信任，以及願意踏出下一步的決心。`,
-      money:   `財富是能量的流動，而能量永遠跟著心態走。牌陣幫你看清了方向，而每一個踏實的選擇，才是豐盛真正落地的方式。`,
-      health:  `身體不會說謊，它以各種方式傳遞著你內心深處的訊息。牌陣提示你重新審視生活的節奏，給身心多一點溫柔的空間，這才是最根本的照顧。`,
-      study:   `學習的成果不只取決於努力，更取決於你對自己學習節奏的認識。牌陣所指的方向，是最符合你天性的學習之道，順著走，才能事半功倍。`,
-      other:   `每一次占卜，都是靈魂與自己的誠實對話。這次牌陣所揭示的，也許正是你心中早已知曉、卻需要一個確認的答案。相信你自己。`,
+      love:    `感情的事，沒有人能百分之百算準。占卜給你的是一個參考方向，而真正決定結果的，是你願意為這段感情付出多少真心和行動。相信自己的感覺，也給對方一點時間。`,
+      career:  `職涯的路是走出來的，不是算出來的。牌陣幫你看了現在的狀態，接下來就踏實地每天往目標靠近一步。急不來，但也不能不動。`,
+      money:   `投資理財最終靠的是紀律和判斷力，而不是運氣好壞。牌陣給你看了方向，但執行還是靠你自己。設好計畫、控管風險、不要因貪心破壞紀律，才是讓財富穩定成長的根本。`,
+      health:  `身體是一切的根本，所有的計畫和夢想都需要健康的身體來支撐。牌陣提醒你要重新關注自己，多照顧一點自己，這是最值得的投資。`,
+      study:   `學習的成果不只看有多努力，也要看對的方法和節奏。牌陣幫你看到了目前的狀態，接下來按自己的步調走就好，不用跟別人比，每天進步一點點就夠了。`,
+      other:   `每次占卜都是一次誠實面對自己的機會。牌陣說的，也許只是把你心裡已經知道的事說出來而已。相信自己的判斷，那是最不容易出錯的答案。`,
     };
     paras.push(CAT_CLOSING[qCat] || CAT_CLOSING.other);
   }
 
   return paras.map(p => `<p class="narrative-para">${p}</p>`).join('');
+}
+
+// ══════════════════════════════════════════════
+//  未來半年運勢分析
+// ══════════════════════════════════════════════
+
+const YEARLY_SIHUA_TABLE = {
+  '甲': { '化祿': '廉貞', '化權': '破軍', '化科': '武曲', '化忌': '太陽' },
+  '乙': { '化祿': '天機', '化權': '天梁', '化科': '紫微', '化忌': '太陰' },
+  '丙': { '化祿': '天同', '化權': '天機', '化科': '文昌', '化忌': '廉貞' },
+  '丁': { '化祿': '太陰', '化權': '天同', '化科': '天機', '化忌': '巨門' },
+  '戊': { '化祿': '貪狼', '化權': '太陰', '化科': '右弼', '化忌': '天機' },
+  '己': { '化祿': '武曲', '化權': '貪狼', '化科': '天梁', '化忌': '文曲' },
+  '庚': { '化祿': '太陽', '化權': '武曲', '化科': '太陰', '化忌': '天同' },
+  '辛': { '化祿': '巨門', '化權': '太陽', '化科': '文曲', '化忌': '文昌' },
+  '壬': { '化祿': '天梁', '化權': '紫微', '化科': '左輔', '化忌': '武曲' },
+  '癸': { '化祿': '破軍', '化權': '巨門', '化科': '太陰', '化忌': '貪狼' },
+};
+
+function generateFutureFortune(result) {
+  const now = new Date();
+  const yr  = now.getFullYear();
+  const mo  = now.getMonth() + 1;
+
+  const { stem } = ZW.getStemBranch(yr);
+  const yearHua  = YEARLY_SIHUA_TABLE[stem] || {};
+
+  // 計算結束月份標籤
+  const endMoRaw = mo + 5;
+  const endYr    = endMoRaw > 12 ? yr + 1 : yr;
+  const endMo    = ((endMoRaw - 1) % 12) + 1;
+  const periodLabel = `${yr} 年 ${mo} 月 ─ ${endYr} 年 ${endMo} 月`;
+
+  // 找出各四化落入哪個宮位
+  const huaInPalace = {};
+  for (const [hua, star] of Object.entries(yearHua)) {
+    for (const palace of result.palaces) {
+      if (palace.stars.includes(star) || palace.auxList.includes(star)) {
+        huaInPalace[hua] = { palace, star };
+        break;
+      }
+    }
+  }
+
+  const luName  = huaInPalace['化祿']?.palace?.name  || '';
+  const jiName  = huaInPalace['化忌']?.palace?.name  || '';
+  const quanName= huaInPalace['化權']?.palace?.name  || '';
+  const keName  = huaInPalace['化科']?.palace?.name  || '';
+
+  // 取各宮位物件
+  const caiP  = result.palaces.find(p => p.name === '財帛');
+  const guanP = result.palaces.find(p => p.name === '官祿');
+  const qiP   = result.palaces.find(p => p.name === '夫妻');
+  const jieP  = result.palaces.find(p => p.name === '疾厄');
+
+  // ── 整體運勢 ──
+  const PALACE_ZH = {
+    '命宮':'整體格局', '財帛':'金錢財運', '官祿':'工作事業', '夫妻':'感情婚姻',
+    '福德':'心靈生活', '遷移':'外出人際', '疾厄':'健康身體', '父母':'長輩文書',
+    '兄弟':'手足合夥', '子女':'後代創作', '奴僕':'朋友部屬', '田宅':'居家不動產',
+  };
+  let overallTxt = `今年（${yr} 年 ${stem} 年），流年化祿落入你的${luName}（${PALACE_ZH[luName] || luName}），`;
+  overallTxt += `代表這半年在這個領域裡會有比較好的機遇，運氣往往在不經意間為你打開一扇門。`;
+  if (quanName) overallTxt += `化權落在${quanName}（${PALACE_ZH[quanName] || quanName}），這個領域今年會有較強的主導力和決斷力，適合積極發揮。`;
+  if (keName)   overallTxt += `化科在${keName}（${PALACE_ZH[keName] || keName}），有助於在這方面的聲譽或學習進展。`;
+  overallTxt += `另一方面，化忌在${jiName}（${PALACE_ZH[jiName] || jiName}），這個方向需要多留心，`;
+  overallTxt += `遇到相關的事情不要衝動，多想一步再行動，通常就能把問題縮小。`;
+
+  // ── 財運 × 工作 ──
+  let moneyTxt = '';
+  if (luName === '財帛') {
+    moneyTxt += `財帛宮今年有化祿加持，是個相對利於理財的時期，收入或投資報酬都可以樂觀看待。但順風時更要保持理性，不要因為一時看好就過度集中押注。`;
+  } else if (jiName === '財帛') {
+    moneyTxt += `財帛宮今年有化忌，在金錢方面需要多注意，避免衝動消費、高風險操作或借貸。`;
+    moneyTxt += `理財以「守住現有」為優先，這半年不是大幅擴張的好時機，穩健保守才是正確姿態。`;
+  } else {
+    const mainStar = caiP?.stars[0] || '';
+    if (['武曲','天府','太陰','祿存'].includes(mainStar)) {
+      moneyTxt += `財帛宮有${mainStar}坐守，本身就有一定的理財底子，這半年只要穩紮穩打，財務不會出大問題，可以樂觀看待。`;
+    } else if (['七殺','破軍','廉貞'].includes(mainStar)) {
+      moneyTxt += `財帛宮有${mainStar}，財運起伏可能比較大，這半年需要多注意支出控管，避免大額借貸或高風險操作。`;
+    } else {
+      moneyTxt += `財運方面這半年整體平穩，維持正常理財節奏、量入為出就好，不需要特別改變策略。`;
+    }
+  }
+  if (luName === '官祿') {
+    moneyTxt += `官祿宮有化祿，工作上的機會比較多，可能有升職、加薪或接到新案子的機會，積極表現會有收穫。`;
+  } else if (jiName === '官祿') {
+    moneyTxt += `官祿宮有化忌，職場上需要多注意，低調行事、專注本職最安全，避免和同事或主管有不必要的摩擦。`;
+  }
+
+  // ── 感情 × 人際 ──
+  let loveTxt = '';
+  if (luName === '夫妻') {
+    loveTxt += `夫妻宮今年有化祿，感情運很不錯，單身的人有機會遇到心動的對象，有伴侶的人則適合趁這段時間增進感情或解決之前的問題，可以樂觀看待。`;
+  } else if (jiName === '夫妻') {
+    loveTxt += `夫妻宮今年有化忌，感情上容易有一些摩擦或誤解，需要多注意溝通方式，不要讓小事演變成大爭執。話說清楚，少一點猜忌，問題通常就能解決。`;
+  } else {
+    const mainStar = qiP?.stars[0] || '';
+    if (['天同','太陰','天梁','天相'].includes(mainStar)) {
+      loveTxt += `夫妻宮坐有${mainStar}，感情偏向溫和穩定，這半年感情生活大致平順，多花時間陪伴，關係自然加溫。`;
+    } else if (['廉貞','貪狼','破軍'].includes(mainStar)) {
+      loveTxt += `夫妻宮有${mainStar}，感情可能比較熱烈也比較多變，這半年需要多一點耐心，避免因一時衝動說出讓雙方後悔的話。`;
+    } else {
+      loveTxt += `感情方面這半年沒有特別強烈的波動，適合維持現有關係的節奏，有需要推進的事可以穩步進行。`;
+    }
+  }
+  if (luName === '遷移' || luName === '奴僕') {
+    loveTxt += `人際方面今年有化祿助力，容易認識對你有幫助的貴人，社交場合值得多把握。`;
+  }
+
+  // ── 健康 × 生活 ──
+  let healthTxt = '';
+  if (jiName === '疾厄') {
+    healthTxt += `疾厄宮今年有化忌，健康方面需要多注意，不舒服的地方要及早就醫，不要拖。`;
+    healthTxt += `作息規律、飲食均衡是這半年最重要的功課，不要因為忙碌就犧牲睡眠和飲食。`;
+  } else if (luName === '疾厄') {
+    healthTxt += `疾厄宮今年有化祿，整體健康狀況不錯，舊傷或慢性問題也有機會改善，可以趁這段時間好好調理身體。`;
+  } else {
+    if (jieP?.stars.some(s => ['七殺','破軍','廉貞','火星','鈴星'].includes(s))) {
+      healthTxt += `疾厄宮的星曜組合提示這半年要注意不要讓自己過度勞累，工作壓力大的時候尤其要留意身體發出的警訊。`;
+    } else {
+      healthTxt += `健康方面這半年大致穩定，但現代人壓力普遍偏大，仍建議保持好的作息習慣，有不舒服就及早處理。`;
+    }
+  }
+
+  // ── 需要多注意 ──
+  const cautions = [];
+  const CAUTION_BY_PALACE = {
+    '財帛': '投資或大額消費前要三思，設好停損點，避免因短期波動做出衝動決策',
+    '官祿': '職場上說話要謹慎，避免捲入派系鬥爭，低調做事比高調表現更安全',
+    '夫妻': '感情上少一點猜忌，有話直說，別讓誤解越積越多',
+    '疾厄': '身體有任何不適要早點就醫，不要一拖再拖，定期健康檢查也很重要',
+    '遷移': '外出旅行或重大移動計畫要事先評估清楚，注意人身安全',
+    '命宮': '心情容易起伏，重大決定不要在情緒高點做，冷靜下來再說',
+    '父母': '與長輩或上司溝通要格外細心，避免產生不必要的誤解',
+    '兄弟': '與合夥人或兄弟姊妹之間的財務往來要清楚，避免因錢產生嫌隙',
+    '福德': '心理壓力可能偏大，適時放鬆很重要，不要讓焦慮影響日常判斷',
+    '田宅': '居家環境注意安全和維修，避免意外損失',
+    '子女': '對晚輩或自己的創作成果多付出一點關注',
+    '奴僕': '交友要謹慎，避免因幫助朋友而捲入不必要的麻煩',
+  };
+  if (jiName && CAUTION_BY_PALACE[jiName]) cautions.push(CAUTION_BY_PALACE[jiName]);
+
+  const mingP = result.palaces.find(p => p.isMing);
+  if (mingP?.stars.includes('七殺') || mingP?.stars.includes('破軍')) {
+    cautions.push('個性容易衝動，遇到衝突先深呼吸，給自己緩衝再回應，避免說出後悔的話');
+  }
+  if (jiName === '財帛' || caiP?.stars.includes('破軍')) {
+    cautions.push('財務上不宜進行高風險操作，理財以穩健為主，有紀律才能走得長遠');
+  }
+  if (cautions.length < 3) cautions.push('睡眠充足是維持好狀態的基礎，再忙也不要犧牲休息');
+  if (cautions.length < 3) cautions.push('重要決定多聽幾個信任的人的意見，集思廣益比一個人鑽牛角尖更有效');
+
+  // 組裝 HTML
+  const secs = [
+    { title: '⭐ 整體運勢概覽', txt: overallTxt },
+    { title: '💰 財運 × 工作',  txt: moneyTxt  },
+    { title: '💕 感情 × 人際',  txt: loveTxt   },
+    { title: '🌿 健康 × 生活',  txt: healthTxt },
+  ];
+
+  let html = `<div class="future-fortune-wrap">`;
+  html += `<p class="fortune-year-label">${yr} 年（${stem}年）流年四化推算</p>`;
+  html += `<p class="fortune-period-label">分析期間：${periodLabel}</p>`;
+  secs.forEach(s => {
+    html += `<div class="fortune-sec"><div class="fortune-sec-title">${s.title}</div><p>${s.txt}</p></div>`;
+  });
+  html += `<div class="fortune-sec fortune-caution-sec">`;
+  html += `<div class="fortune-sec-title">⚠️ 這半年需要多注意</div>`;
+  html += `<ul class="caution-list">${cautions.slice(0,4).map(c => `<li>${c}</li>`).join('')}</ul>`;
+  html += `</div></div>`;
+  return html;
 }
 
 function resetNewFlow() {

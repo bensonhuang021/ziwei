@@ -1012,6 +1012,65 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
   border-top: 1px solid rgba(201,160,42,.15);
 }
 
+/* ── 未來半年運勢 ── */
+.future-fortune-wrap { padding: .2rem 0; }
+.fortune-year-label {
+  color: var(--gold);
+  font-size: .85rem;
+  letter-spacing: .08em;
+  margin-bottom: .25rem;
+}
+.fortune-period-label {
+  color: var(--text-dim);
+  font-size: .82rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: .8rem;
+  border-bottom: 1px solid var(--border);
+}
+.fortune-sec {
+  margin-bottom: 1rem;
+  padding: 1rem 1.2rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.fortune-sec p { color: var(--text); font-size: .92rem; line-height: 2; }
+.fortune-sec-title {
+  color: var(--gold-l);
+  font-size: .95rem;
+  font-weight: 600;
+  margin-bottom: .7rem;
+  letter-spacing: .06em;
+}
+.fortune-caution-sec {
+  border-color: rgba(201,160,42,.45);
+  background: rgba(201,160,42,.04);
+}
+.fortune-caution-sec .fortune-sec-title { color: #e8a020; }
+.caution-list { list-style: none; padding: 0; margin: 0; }
+.caution-list li {
+  color: var(--text);
+  font-size: .91rem;
+  line-height: 1.85;
+  padding: .35rem 0 .35rem 1.4rem;
+  position: relative;
+  border-bottom: 1px dashed rgba(201,160,42,.12);
+}
+.caution-list li:last-child { border-bottom: none; }
+.caution-list li::before { content: '›'; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
+
+/* 時辰不詳提示 */
+.hour-unknown-note {
+  color: #e8a020;
+  font-size: .83rem;
+  padding: .5rem .8rem;
+  background: rgba(232,160,32,.07);
+  border-left: 3px solid #e8a020;
+  border-radius: 0 var(--r) var(--r) 0;
+  margin-bottom: 1rem;
+}
+.hour-unknown-note strong { color: #f0b030; }
+
 /* ── 響應式 ── */
 @media (max-width: 480px) {
   .birth-form { grid-template-columns: 1fr; }
