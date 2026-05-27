@@ -339,7 +339,15 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
 }
 
 /* ── 命盤格子 ── */
-.ziwei-grid-wrap { overflow-x: auto; }
+.ziwei-grid-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.grid-scroll-hint {
+  display: none;
+  text-align: center;
+  font-size: .75rem;
+  color: var(--text-dim);
+  padding: .3rem 0 .5rem;
+  letter-spacing: .05em;
+}
 .ziwei-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -606,13 +614,112 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
 ::-webkit-scrollbar-track { background: var(--surface); }
 ::-webkit-scrollbar-thumb { background: var(--gold-d); border-radius: 3px; }
 
-/* ── 響應式 ── */
-@media (max-width: 600px) {
-  .site-title { font-size: 1.8rem; }
-  .main-nav { gap: .3rem; }
-  .nav-btn { padding: .45rem .9rem; font-size: .82rem; }
+/* ══════════════════════════════════════════
+   手機優先響應式設計
+   ══════════════════════════════════════════ */
+
+/* ── iOS 防縮放：輸入框字體 ≥ 16px ── */
+@media (max-width: 768px) {
+  .form-select, .form-input, .bf-input,
+  .question-input, textarea { font-size: 16px; }
+}
+
+/* ── 觸控裝置回饋（取代 hover）── */
+@media (hover: none) and (pointer: coarse) {
+  .btn:active {
+    background: linear-gradient(135deg, rgba(201,160,42,.3), rgba(124,58,237,.22));
+    border-color: var(--gold);
+    box-shadow: 0 0 16px var(--gold-glow);
+  }
+  .nav-btn:active    { color: var(--gold); border-color: var(--gold-d); }
+  .q-cat-btn:active  { border-color: var(--gold); background: var(--surface3); }
+  .feature-card:active { border-color: var(--gold); box-shadow: 0 0 18px var(--gold-glow); }
+  .strip-card:active:not(.selected):not(.done) {
+    transform: translateY(-6px) scale(1.04);
+    border-color: var(--gold);
+    box-shadow: 0 6px 18px rgba(0,0,0,.5), 0 0 10px var(--gold-glow);
+  }
+  .palace-cell:active { background: var(--surface3); }
+  .result-card-flipper:active { opacity: .85; }
+}
+
+/* ── 平板以下（≤ 768px）── */
+@media (max-width: 768px) {
+  main { padding: 1.2rem .75rem; }
+
+  /* 頭部 */
+  .site-header   { padding: 1.8rem 1rem 1rem; }
+  .site-subtitle { font-size: .88rem; letter-spacing: .18em; }
+  .site-deco     { letter-spacing: .25em; font-size: .75rem; }
+
+  /* 導航 */
+  .nav-btn { padding: .6rem 1.5rem; font-size: .92rem; min-height: 44px; }
+
+  /* 面板 */
+  .panel       { padding: 1.2rem 1rem; margin-bottom: 1rem; }
+  .panel-title { font-size: 1.05rem; letter-spacing: .05em; margin-bottom: .9rem; }
+
+  /* 首頁 */
+  .home-hero      { padding: 1.5rem 0 1rem; }
+  .home-intro     { font-size: .95rem; }
+  .home-features  { grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem; }
+  .feature-card   { padding: 1.2rem 1rem; }
+  .feature-icon   { font-size: 2rem; margin-bottom: .6rem; }
+  .feature-title  { font-size: 1rem; }
+  .feature-desc   { font-size: .85rem; }
+
+  /* 按鈕 — 全寬方便手指點擊 */
+  .btn        { padding: .75rem 1.4rem; font-size: .95rem; min-height: 44px; }
+  .btn-row    { flex-direction: column; align-items: stretch; gap: .7rem; }
+  .btn-row .btn, .btn-row .btn-secondary { text-align: center; width: 100%; }
+
+  /* 表單選單 */
+  .form-select { min-height: 44px; padding: .6rem .9rem; }
+  .ziwei-form  { grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+  /* 命盤橫滑提示（只在手機顯示）*/
+  .grid-scroll-hint { display: block; }
+
+  /* 命盤格 */
+  .ziwei-grid {
+    min-width: 420px;
+    grid-template-rows: repeat(4, minmax(88px, auto));
+  }
+  .palace-cell  { padding: .4rem .3rem; min-height: 88px; }
+  .palace-name  { font-size: .72rem; }
+  .major-star   { font-size: .72rem; }
+  .aux-star     { font-size: .64rem; }
+  .palace-center { padding: .6rem .4rem; }
+  .center-title  { font-size: .78rem; letter-spacing: .08em; margin-bottom: .5rem; }
+  .center-item   { font-size: .72rem; margin-bottom: .25rem; }
+
+  /* Modal */
+  .modal-box  { padding: 1.4rem 1.1rem; }
+  .modal-card { gap: 1.2rem; }
   .modal-both { grid-template-columns: 1fr; }
-  .ziwei-form { grid-template-columns: 1fr 1fr; }
+
+  /* 命盤概覽 */
+  .ziwei-summary { grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+  .summary-label  { font-size: .7rem; }
+  .summary-value  { font-size: .92rem; }
+
+  /* 解讀文字 */
+  .narrative-para  { font-size: .92rem; text-indent: 1em; line-height: 1.95; }
+  .reading-item h4 { font-size: .9rem; }
+  .reading-item p  { font-size: .9rem; }
+
+  /* 未來半年運勢 */
+  .fortune-sec       { padding: .85rem .9rem; }
+  .fortune-sec p     { font-size: .89rem; line-height: 1.9; }
+  .fortune-sec-title { font-size: .9rem; }
+  .caution-list li   { font-size: .87rem; }
+
+  /* 占卜流程 */
+  .birth-form { grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .bf-input   { padding: .6rem .8rem; min-height: 44px; }
+  .q-cat-grid { grid-template-columns: repeat(3, 1fr); gap: .55rem; }
+  .q-cat-btn  { font-size: .84rem; padding: .7rem .3rem; min-height: 44px; }
+  .result-cards-row { gap: 1.2rem; }
 }
 
 /* ══════════════════════════════════════════
@@ -1071,9 +1178,126 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
 }
 .hour-unknown-note strong { color: #f0b030; }
 
-/* ── 響應式 ── */
+/* ── 手機（≤ 480px）── */
 @media (max-width: 480px) {
+  main { padding: .9rem .55rem; }
+
+  /* 頭部 */
+  .site-header   { padding: 1.3rem .75rem .7rem; }
+  .site-subtitle { font-size: .82rem; letter-spacing: .12em; }
+  .site-deco     { display: none; }
+
+  /* 面板 */
+  .panel       { padding: .9rem .8rem; border-radius: var(--r); }
+  .panel-title { font-size: .95rem; }
+
+  /* 首頁 */
+  .home-hero     { padding: .8rem 0; }
+  .home-intro    { font-size: .9rem; line-height: 1.8; }
+  .home-features { grid-template-columns: 1fr 1fr; gap: .7rem; margin-top: 1rem; }
+  .feature-card  { padding: 1rem .75rem; }
+  .feature-icon  { font-size: 1.6rem; margin-bottom: .4rem; }
+  .feature-title { font-size: .9rem; }
+  .feature-desc  { font-size: .8rem; line-height: 1.5; }
+
+  /* 按鈕 */
+  .btn     { padding: .8rem 1.2rem; font-size: .92rem; letter-spacing: .05em; }
+  .btn-row { gap: .6rem; }
+
+  /* 表單 */
+  .ziwei-form { grid-template-columns: 1fr; }
+  .form-hint  { font-size: .77rem; }
+
+  /* 命盤格 */
+  .ziwei-grid {
+    min-width: 320px;
+    grid-template-rows: repeat(4, minmax(72px, auto));
+  }
+  .palace-cell   { padding: .25rem .2rem; min-height: 72px; }
+  .palace-header { gap: .1rem; margin-bottom: .12rem; flex-wrap: nowrap; }
+  .palace-branch { font-size: .58rem; }
+  .palace-name   { font-size: .63rem; }
+  .star, .major-star { font-size: .6rem; }
+  .aux-star      { font-size: .55rem; }
+  .palace-stars  { gap: .12rem; }
+  .palace-aux    { gap: .1rem; }
+  .ming-badge, .shen-badge { font-size: .52rem; padding: 1px 3px; }
+  .palace-center { padding: .35rem; }
+  .center-title  { font-size: .68rem; letter-spacing: .04em; margin-bottom: .35rem; }
+  .center-item   { font-size: .63rem; gap: .25rem; margin-bottom: .18rem; }
+
+  /* 命盤概覽 */
+  .ziwei-summary { grid-template-columns: repeat(2, 1fr); gap: .5rem; }
+  .summary-item  { padding: .6rem .5rem; }
+  .summary-label { font-size: .65rem; }
+  .summary-value { font-size: .85rem; }
+
+  /* 四化 */
+  .sihua-grid { gap: .45rem; }
+  .sihua-item { padding: .3rem .6rem; }
+  .hua-name, .hua-star { font-size: .75rem; }
+
+  /* 進度條 */
+  .flow-progress { padding: 1rem .4rem .5rem; }
+  .fp-dot   { width: 26px; height: 26px; font-size: .68rem; }
+  .fp-label { font-size: .6rem; }
+  .fp-line  { width: 8px; }
+
+  /* 生辰表單 */
   .birth-form { grid-template-columns: 1fr; }
-  .q-cat-grid { grid-template-columns: repeat(2, 1fr); }
-  .fp-line { width: 14px; }
+
+  /* 問題類型 */
+  .q-cat-grid { grid-template-columns: repeat(2, 1fr); gap: .5rem; }
+  .q-cat-btn  { padding: .75rem .3rem; font-size: .85rem; }
+
+  /* 78 張牌帶 */
+  .strip-arrow { width: 32px; height: 32px; font-size: 1.1rem; }
+
+  /* 結果牌排 */
+  .result-cards-row { gap: .8rem; }
+  .drawn-spread     { gap: 1rem; }
+
+  /* Modal */
+  .modal-box          { padding: 1rem .85rem; max-height: 92vh; border-radius: var(--r); }
+  .modal-close        { font-size: 1.3rem; top: .7rem; right: .7rem; }
+  .modal-card-visual  { width: 90px; height: 145px; }
+  .modal-card-header h2 { font-size: 1.1rem; }
+  .modal-keywords     { font-size: .85rem; }
+  .modal-meaning      { padding: .8rem; }
+
+  /* 解讀文字 */
+  .reading-narrative-section { margin-top: 1.2rem; padding-top: 1rem; }
+  .narrative-para { font-size: .9rem; text-indent: 0; line-height: 1.9; margin-bottom: 1rem; }
+  .narrative-para:last-child { font-style: normal; }
+  .reading-item       { padding-left: .75rem; }
+  .reading-item h4    { font-size: .85rem; }
+  .reading-item p     { font-size: .87rem; line-height: 1.7; }
+  .reading-keywords   { font-size: .8rem; }
+  .reading-summary    { padding: .9rem; }
+  .reading-question   { font-size: 1rem; margin-bottom: 1rem; }
+
+  /* 未來半年運勢 */
+  .fortune-year-label   { font-size: .8rem; }
+  .fortune-period-label { font-size: .76rem; margin-bottom: .9rem; padding-bottom: .6rem; }
+  .fortune-sec          { padding: .7rem .75rem; margin-bottom: .7rem; }
+  .fortune-sec p        { font-size: .86rem; line-height: 1.85; }
+  .fortune-sec-title    { font-size: .86rem; margin-bottom: .5rem; }
+  .caution-list li      { font-size: .84rem; padding: .28rem 0 .28rem 1.1rem; }
+
+  /* 時辰不詳 */
+  .hour-unknown-note { font-size: .78rem; padding: .45rem .7rem; }
+
+  /* 結果生辰標籤 */
+  .result-birth-tag { font-size: .82rem; padding: .8rem; }
+  .result-q-text    { font-size: .92rem; }
+}
+
+/* ── 超小手機（≤ 360px）── */
+@media (max-width: 360px) {
+  .home-features { grid-template-columns: 1fr; }
+  .fp-dot  { width: 24px; height: 24px; font-size: .64rem; }
+  .fp-line { width: 5px; }
+  .fp-label { font-size: .56rem; }
+  .ziwei-summary { grid-template-columns: repeat(2, 1fr); }
+  .q-cat-grid    { grid-template-columns: 1fr 1fr; }
 }

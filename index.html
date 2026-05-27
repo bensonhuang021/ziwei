@@ -211,6 +211,7 @@
         <div class="panel">
           <div class="panel-title">十二宮命盤（點擊宮位查看詳解）</div>
           <div class="ziwei-grid-wrap">
+            <div class="grid-scroll-hint">← 左右滑動查看完整命盤 →</div>
             <div id="ziwei-grid" class="ziwei-grid"></div>
           </div>
         </div>
@@ -265,7 +266,7 @@
           <div class="birth-form">
             <div class="bf-row">
               <label class="bf-label">西元年</label>
-              <input type="number" id="bf-year" class="bf-input" min="1920" max="2010" placeholder="例：1990" autocomplete="off">
+              <input type="number" id="bf-year" class="bf-input" min="1920" max="2010" placeholder="例：1990" autocomplete="off" inputmode="numeric">
             </div>
             <div class="bf-row">
               <label class="bf-label">月份</label>
@@ -395,6 +396,7 @@
           <div class="panel">
             <div class="panel-title">紫微斗數命盤 <span style="font-size:.75rem;color:var(--text-dim);font-weight:400">（根據西元生日近似換算）</span></div>
             <div class="ziwei-grid-wrap">
+              <div class="grid-scroll-hint">← 左右滑動查看完整命盤 →</div>
               <div id="new-ziwei-grid" class="ziwei-grid"></div>
             </div>
             <div id="new-ming-summary"></div>
