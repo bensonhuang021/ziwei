@@ -1,0 +1,12 @@
+# Claude Code 內部設定（不需要上傳）
+.claude/
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 編輯器
+.vscode/
+*.swp
+*.swo
