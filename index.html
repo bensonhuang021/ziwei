@@ -32,35 +32,122 @@
 
     <!-- ══ 首頁 ══ -->
     <section id="sec-home" class="section active">
-      <div class="home-hero">
-        <p class="home-intro">
-          星塔占卜結合西方塔羅牌的直覺智慧，與東方紫微斗數的命理精髓，
-          為你揭示命運的多面向。透過牌陣與命盤的交織解讀，
-          從不同維度探索你的人生旅程。
-        </p>
-      </div>
-      <div class="home-features">
-        <div class="feature-card" onclick="showSection('tarot')">
-          <div class="feature-icon">🃏</div>
-          <div class="feature-title">塔羅占卜</div>
-          <div class="feature-desc">78 張完整塔羅牌陣，含單張、三張牌及凱爾特十字牌陣，正逆位詳解。</div>
+
+      <!-- 老師介紹 -->
+      <div class="teacher-wrap">
+        <div class="teacher-avatar-wrap">
+          <div class="teacher-avatar">☽</div>
         </div>
-        <div class="feature-card" onclick="showSection('ziwei')">
-          <div class="feature-icon">☯</div>
-          <div class="feature-title">紫微命盤</div>
-          <div class="feature-desc">根據農曆生辰排出完整十二宮命盤，14 顆主星、輔星、四化一覽無遺。</div>
-        </div>
-        <div class="feature-card" onclick="showSection('combined')">
-          <div class="feature-icon">✦</div>
-          <div class="feature-title">綜合解讀</div>
-          <div class="feature-desc">將塔羅牌的能量與命盤宮位對應，提供更深層的命運洞見。</div>
-        </div>
-        <div class="feature-card" onclick="showSection('question')">
-          <div class="feature-icon">🔮</div>
-          <div class="feature-title">占卜解讀</div>
-          <div class="feature-desc">輸入生辰與問題，洗牌後從 78 張牌中挑選 3 張，系統同步排出紫微命盤，給出深度解讀。</div>
+        <div class="teacher-bio">
+          <h2 class="teacher-name">李老師</h2>
+          <div class="teacher-tagline">從事命理研究近 30 年・中西命理雙修</div>
+          <p class="teacher-desc">
+            早年在台灣跟隨多位命理前輩深研紫微斗數，後赴歐洲研習塔羅牌與西方占星，
+            融合東西方命理精髓，至今已協助數千位各行各業的朋友解答人生困惑。
+          </p>
+          <p class="teacher-desc" style="margin-top:.75rem">
+            命理的作用不是替你做決定，而是讓你<strong>看清楚自己正站在哪條路上</strong>，
+            讓你在做選擇的時候，多一份根據，少一份茫然。
+          </p>
+          <div class="teacher-tags">
+            <span class="teacher-tag">紫微斗數</span>
+            <span class="teacher-tag">塔羅牌</span>
+            <span class="teacher-tag">西方占星</span>
+            <span class="teacher-tag">八字命理</span>
+          </div>
         </div>
       </div>
+
+      <!-- 真實故事 -->
+      <div class="home-stories">
+        <div class="home-section-title">✦ 幾個真實的故事 ✦</div>
+        <div class="stories-grid">
+          <div class="story-card">
+            <div class="story-header">
+              <span class="story-icon">💕</span>
+              <span class="story-topic">感情篇</span>
+            </div>
+            <p class="story-text">
+              有位 35 歲的女性，工作穩定卻一直找不到對象，家人催婚的壓力讓她喘不過氣。
+              命盤夫妻宮坐七殺星，塔羅抽到「力量」逆位——我告訴她：
+              「你現在還在尋找自己想要的生活方式，還沒有準備好進入一段關係，這不是你的問題，是時機。」
+              她把重心轉向自我成長，兩年後認識了現在的先生。
+            </p>
+          </div>
+          <div class="story-card">
+            <div class="story-header">
+              <span class="story-icon">💼</span>
+              <span class="story-topic">事業篇</span>
+            </div>
+            <p class="story-text">
+              一位男性在同一家公司做了 10 年，感覺卡住了，想出走創業。
+              命盤事業宮有破軍星，塔羅出「命運之輪」正位——我說：
+              「你確實到了一個轉折點，但創業前要先把財務基礎打穩，否則只是把舊問題帶到新地方。」
+              他花了半年整頓，創業後第一年就獲利。
+            </p>
+          </div>
+          <div class="story-card">
+            <div class="story-header">
+              <span class="story-icon">💰</span>
+              <span class="story-topic">財運篇</span>
+            </div>
+            <p class="story-text">
+              一個年輕人來問：「我今年要不要買房？」當時正值財帛宮化忌流年，
+              塔羅出「月亮」逆位。我的答案是：
+              「先等半年，你現在看到的條件有些不清楚的地方。」
+              他照做了，後來發現那間房有產權問題，幸好沒有出手。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 可以算什麼 -->
+      <div class="home-what-can">
+        <div class="home-section-title">✦ 這些命理工具能幫你做什麼？✦</div>
+        <div class="what-can-grid">
+          <div class="what-can-card">
+            <div class="wc-head">
+              <span class="wc-icon">🃏</span>
+              <div>
+                <div class="wc-title">塔羅牌占卜</div>
+                <div class="wc-subtitle">當下能量・直覺指引</div>
+              </div>
+            </div>
+            <ul class="wc-list">
+              <li>這段感情現在走向哪裡？對方心裡在想什麼？</li>
+              <li>換工作的時機到了嗎？這個合作對象可信嗎？</li>
+              <li>這筆錢現在出手，時機對嗎？</li>
+              <li>這個人對我是真心的嗎？</li>
+              <li>我最近為什麼老是覺得卡卡的？</li>
+            </ul>
+          </div>
+          <div class="what-can-card">
+            <div class="wc-head">
+              <span class="wc-icon">☯</span>
+              <div>
+                <div class="wc-title">紫微斗數命盤</div>
+                <div class="wc-subtitle">先天格局・大運流年</div>
+              </div>
+            </div>
+            <ul class="wc-list">
+              <li>了解你天生的個性優勢，以及容易踩到的坑</li>
+              <li>哪些年份是你人生重要的轉折點</li>
+              <li>感情、事業、財運各宮位的先天條件如何</li>
+              <li>今年大運機遇在哪裡、有哪些風險需要留意</li>
+              <li>未來半年整體運勢的走向與建議</li>
+            </ul>
+          </div>
+        </div>
+        <div class="what-can-note">
+          塔羅牌看的是「此刻的能量走向」，紫微斗數看的是「先天命盤加上流年大架構」。
+          兩者合用，就像既有路況即時資訊，又有一張完整地圖——
+          <strong>知道自己在哪裡，也知道前方的路怎麼走。</strong>
+        </div>
+        <div class="btn-row" style="margin-top:2rem">
+          <button class="btn" onclick="showSection('question')">🔮 開始占卜解讀</button>
+        </div>
+      </div>
+
       <div class="divider">✦ ✦ ✦</div>
     </section>
 

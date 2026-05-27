@@ -145,6 +145,154 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
 .feature-title { color: var(--gold); font-size: 1.1rem; font-weight: 600; margin-bottom: .5rem; }
 .feature-desc { color: var(--text-dim); font-size: .9rem; line-height: 1.6; }
 
+/* ── 首頁：老師介紹 ── */
+.teacher-wrap {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  padding: 2.5rem 2rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: 2.5rem;
+}
+.teacher-avatar-wrap { flex-shrink: 0; }
+.teacher-avatar {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  border: 2px solid var(--gold-d);
+  background: radial-gradient(circle at 35% 35%, rgba(201,160,42,.18), rgba(124,58,237,.25));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.2rem;
+  box-shadow: 0 0 28px var(--gold-glow);
+}
+.teacher-name {
+  font-size: 1.6rem; font-weight: 700;
+  color: var(--gold-l);
+  letter-spacing: .12em;
+  margin-bottom: .35rem;
+}
+.teacher-tagline {
+  font-size: .9rem; color: var(--purple-l);
+  letter-spacing: .1em; margin-bottom: 1rem;
+}
+.teacher-desc {
+  font-size: .95rem; color: var(--text-dim);
+  line-height: 1.9;
+}
+.teacher-desc strong { color: var(--gold-l); }
+.teacher-tags {
+  display: flex; flex-wrap: wrap; gap: .5rem;
+  margin-top: 1.2rem;
+}
+.teacher-tag {
+  padding: .2rem .75rem;
+  border: 1px solid var(--border-b);
+  border-radius: 2em;
+  font-size: .78rem;
+  color: var(--gold);
+  background: rgba(201,160,42,.07);
+  letter-spacing: .05em;
+}
+
+/* ── 首頁：故事區 ── */
+.home-stories { margin-bottom: 2.5rem; }
+.home-section-title {
+  text-align: center;
+  font-size: 1.05rem;
+  color: var(--gold-d);
+  letter-spacing: .35em;
+  margin-bottom: 1.5rem;
+}
+.stories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.2rem;
+}
+.story-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.5rem;
+  transition: border-color .25s, box-shadow .25s;
+}
+.story-card:hover {
+  border-color: var(--gold-d);
+  box-shadow: 0 0 20px rgba(201,160,42,.15);
+}
+.story-header {
+  display: flex; align-items: center; gap: .6rem;
+  margin-bottom: 1rem;
+}
+.story-icon { font-size: 1.4rem; }
+.story-topic {
+  font-size: .95rem; font-weight: 600;
+  color: var(--gold); letter-spacing: .08em;
+}
+.story-text {
+  font-size: .88rem; color: var(--text-dim);
+  line-height: 1.85;
+}
+
+/* ── 首頁：能幫你做什麼 ── */
+.home-what-can {
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: 2rem;
+}
+.what-can-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+.what-can-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1.5rem;
+}
+.wc-head {
+  display: flex; align-items: center; gap: .9rem;
+  margin-bottom: 1.1rem;
+}
+.wc-icon { font-size: 2rem; flex-shrink: 0; }
+.wc-title {
+  font-size: 1.05rem; font-weight: 600;
+  color: var(--gold); letter-spacing: .06em;
+}
+.wc-subtitle {
+  font-size: .78rem; color: var(--purple-l);
+  margin-top: .2rem; letter-spacing: .08em;
+}
+.wc-list {
+  list-style: none; padding: 0;
+}
+.wc-list li {
+  font-size: .88rem; color: var(--text-dim);
+  line-height: 1.75;
+  padding: .3rem 0 .3rem 1.2rem;
+  position: relative;
+  border-bottom: 1px solid rgba(201,160,42,.08);
+}
+.wc-list li:last-child { border-bottom: none; }
+.wc-list li::before {
+  content: '▸';
+  position: absolute; left: 0;
+  color: var(--gold-d); font-size: .75rem;
+}
+.what-can-note {
+  margin-top: 1.5rem;
+  font-size: .9rem; color: var(--text-dim);
+  line-height: 1.85;
+  text-align: center;
+  padding: 1.2rem 1.5rem;
+  border-top: 1px solid var(--border);
+}
+.what-can-note strong { color: var(--gold-l); }
+
 /* ── 通用卡片面板 ── */
 .panel {
   background: var(--surface);
@@ -667,6 +815,15 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
   .feature-icon   { font-size: 2rem; margin-bottom: .6rem; }
   .feature-title  { font-size: 1rem; }
   .feature-desc   { font-size: .85rem; }
+
+  /* 首頁：老師介紹 */
+  .teacher-wrap   { flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; padding: 1.5rem 1rem; }
+  .teacher-name   { font-size: 1.35rem; }
+  .teacher-tags   { justify-content: center; }
+  .stories-grid   { grid-template-columns: 1fr; gap: 1rem; }
+  .what-can-grid  { grid-template-columns: 1fr; gap: 1rem; }
+  .home-what-can  { padding: 1.2rem 1rem; }
+  .what-can-note  { font-size: .85rem; padding: 1rem .5rem; }
 
   /* 按鈕 — 全寬方便手指點擊 */
   .btn        { padding: .75rem 1.4rem; font-size: .95rem; min-height: 44px; }
