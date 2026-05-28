@@ -75,6 +75,8 @@ function showSection(id) {
   if (btn) btn.classList.add('active');
   STATE.currentSection = id;
   window.scrollTo(0, 0);
+  // 切到本日運勢頁時初始化下拉選單
+  if (id === 'daily') dfInitSelects();
 }
 
 // ══════════════════════════════════════════════
@@ -2341,5 +2343,5 @@ function dfReset() {
   }, 320);
 }
 
-// 頁面載入後初始化下拉選單
-document.addEventListener('DOMContentLoaded', dfInitSelects);
+// 頁面載入後初始化下拉選單（DOMContentLoaded 時本日運勢不是預設頁，延遲到切換時再初始化）
+// dfInitSelects() 內部有防重複執行的判斷，可安全多次呼叫
