@@ -1323,6 +1323,29 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
 .caution-list li:last-child { border-bottom: none; }
 .caution-list li::before { content: '›'; position: absolute; left: 0; color: var(--gold); font-weight: 700; }
 
+/* 農曆換算誤差提示 */
+.lunar-convert-note {
+  font-size: .83rem;
+  color: #d4a020;
+  padding: .6rem .9rem;
+  background: rgba(201,160,42,.07);
+  border-left: 3px solid var(--gold-d);
+  border-radius: 0 var(--r) var(--r) 0;
+  margin-bottom: 1.1rem;
+  line-height: 1.65;
+}
+.btn-inline-link {
+  background: none;
+  border: none;
+  color: var(--gold-l);
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  text-decoration: underline;
+  padding: 0;
+}
+.btn-inline-link:hover { color: var(--gold); }
+
 /* 時辰不詳提示 */
 .hour-unknown-note {
   color: #e8a020;

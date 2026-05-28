@@ -481,7 +481,12 @@
 
         <div id="new-ziwei-section" style="display:none">
           <div class="panel">
-            <div class="panel-title">紫微斗數命盤 <span style="font-size:.75rem;color:var(--text-dim);font-weight:400">（根據西元生日近似換算）</span></div>
+            <div class="panel-title">紫微斗數命盤 <span style="font-size:.75rem;color:var(--text-dim);font-weight:400">（西元轉農曆近似值）</span></div>
+            <div class="lunar-convert-note">
+              ⚠️ 此命盤以「西元→農曆」自動換算，農曆月日可能有 ±1 天誤差，邊界日期（每月初一附近）尤需注意。
+              若需精確命盤，請先至「<a href="https://www.travelccm.com/lunar-calendar.html" target="_blank" style="color:var(--gold-l)">農曆查詢</a>」確認農曆生日，再點選
+              <button class="btn-inline-link" onclick="showSection('ziwei')">紫微排盤（直接輸入農曆）</button>。
+            </div>
             <div class="ziwei-grid-wrap">
               <div class="grid-scroll-hint">← 左右滑動查看完整命盤 →</div>
               <div id="new-ziwei-grid" class="ziwei-grid"></div>

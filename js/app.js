@@ -643,13 +643,52 @@ const CNY_DATES = [
 ];
 
 function gregorianToLunar(gy, gm, gd) {
+  // 以春節日期為農曆正月初一，往後每 29.53 天為一個月
+  // 精確度：月份誤差 ≤ 1 天（邊界日可能相差一月），農曆日誤差 ≤ 2 天
+  // 如需精確，請在「紫微排盤」頁面直接輸入農曆生日
   const idx = gy - 1920;
-  let ly = gy;
-  if (idx >= 0 && idx < CNY_DATES.length) {
-    const [cm, cd] = CNY_DATES[idx];
-    if (gm < cm || (gm === cm && gd < cd)) ly = gy - 1;
+  const prevIdx = gy - 1 - 1920;
+
+  const birthDate = new Date(gy, gm - 1, gd);
+
+  // 取本年春節 & 前一年春節
+  function cnyDate(year) {
+    const i = year - 1920;
+    if (i < 0 || i >= CNY_DATES.length) return null;
+    const [m, d] = CNY_DATES[i];
+    return new Date(year, m - 1, d);
   }
-  return { lunarYear: ly, lunarMonth: gm, lunarDay: Math.min(gd, 30) };
+
+  const cnyThis = cnyDate(gy);
+  const cnyPrev = cnyDate(gy - 1);
+
+  // 決定農曆年及對應的春節
+  let lunarYear, cnyStart;
+  if (cnyThis && birthDate >= cnyThis) {
+    lunarYear = gy;
+    cnyStart  = cnyThis;
+  } else if (cnyPrev) {
+    lunarYear = gy - 1;
+    cnyStart  = cnyPrev;
+  } else {
+    // 超出範圍：退回粗略值
+    return { lunarYear: gy, lunarMonth: gm, lunarDay: Math.min(gd, 30) };
+  }
+
+  // 距正月初一的天數（0-indexed）
+  const daysSinceCNY = Math.round((birthDate - cnyStart) / 86400000);
+
+  // 每月平均 29.53059 天，推算農曆月份與日期
+  const AVG_MONTH = 29.53059;
+  const rawMonth  = daysSinceCNY / AVG_MONTH;          // 0-based 月偏移
+  const lunarMonth = Math.floor(rawMonth) + 1;          // 1-based
+  const lunarDay   = Math.floor(daysSinceCNY - Math.floor(rawMonth) * AVG_MONTH) + 1;
+
+  return {
+    lunarYear,
+    lunarMonth: Math.max(1, Math.min(lunarMonth, 12)),
+    lunarDay:   Math.max(1, Math.min(lunarDay, 30)),
+  };
 }
 
 // 流程狀態

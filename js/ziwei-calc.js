@@ -247,11 +247,11 @@ const ZW = (() => {
   function placeAuxStars(yearStemIdx, yearBranchIdx, month, hour) {
     const aux = {};
 
-    // 文昌 (by 年支)
-    aux['文昌'] = (10 - yearBranchIdx + 12) % 12;
+    // 文昌 (by 時辰：起戌逆布，子時=戌、丑時=酉…)
+    aux['文昌'] = (10 - hour + 12) % 12;
 
-    // 文曲 (by 年支)
-    aux['文曲'] = (4 + yearBranchIdx) % 12;
+    // 文曲 (by 時辰：起辰順布，子時=辰、丑時=巳…)
+    aux['文曲'] = (4 + hour) % 12;
 
     // 左輔 (by 月)
     aux['左輔'] = (3 + month) % 12;
