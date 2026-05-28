@@ -33,6 +33,87 @@
     <!-- ══ 首頁 ══ -->
     <section id="sec-home" class="section active">
 
+      <!-- ══ 本日運勢分析 ══ -->
+      <div id="daily-fortune" class="df-wrap">
+
+        <!-- 輸入面板 -->
+        <div id="df-input" class="df-panel df-input-panel">
+          <div class="df-header">
+            <div class="df-crown">✦ ✦ ✦</div>
+            <h2 class="df-title">本日運勢分析</h2>
+            <p class="df-subtitle">閉上眼睛，讓直覺引領你選擇一個數字<br>融合生辰能量，解讀今日命運軌跡</p>
+          </div>
+
+          <div class="df-body">
+            <!-- 數字選擇 -->
+            <div class="df-num-section">
+              <div class="df-section-label">✧ 閉眼，讓直覺選一個數字（1 – 100）✧</div>
+              <div class="df-num-row">
+                <button class="df-num-arrow" onclick="dfAdjust(-1)">◀</button>
+                <div class="df-orb" id="df-orb">
+                  <div class="df-orb-ring"></div>
+                  <div class="df-orb-inner">
+                    <span id="df-orb-num">?</span>
+                  </div>
+                </div>
+                <button class="df-num-arrow" onclick="dfAdjust(1)">▶</button>
+              </div>
+              <div class="df-slider-row">
+                <span class="df-s-tip">1</span>
+                <input type="range" id="df-slider" class="df-slider" min="1" max="100"
+                       oninput="dfUpdateNum(this.value)">
+                <span class="df-s-tip">100</span>
+              </div>
+            </div>
+
+            <!-- 生日 + 性別 -->
+            <div class="df-info-row">
+              <div class="df-field-group">
+                <div class="df-field-label">出生日期</div>
+                <div class="df-birth-selects">
+                  <select id="df-year"  class="df-sel" onchange="dfOnChange('y')"></select>
+                  <select id="df-month" class="df-sel" onchange="dfOnChange('m')"></select>
+                  <select id="df-day"   class="df-sel" onchange="dfOnChange('d')"></select>
+                </div>
+              </div>
+              <div class="df-field-group">
+                <div class="df-field-label">性別</div>
+                <div class="df-gender-wrap" id="df-gender-wrap">
+                  <button class="df-gender-btn active" data-g="M" onclick="dfSetGender('M')">♂ 男</button>
+                  <button class="df-gender-btn"        data-g="F" onclick="dfSetGender('F')">♀ 女</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="df-start-btn" id="df-start-btn" onclick="startDailyFortune()">
+              ✦ 開始占卜 ✦
+            </button>
+          </div>
+        </div><!-- /df-input-panel -->
+
+        <!-- 動畫面板 -->
+        <div id="df-anim" class="df-panel df-anim-panel" style="display:none">
+          <div id="df-float-stars" class="df-float-stars"></div>
+          <div class="df-crystal-wrap">
+            <div class="df-crystal-ring-outer"></div>
+            <div class="df-crystal" id="df-crystal">
+              <div class="df-crystal-shimmer"></div>
+              <div class="df-crystal-num" id="df-crystal-num">?</div>
+            </div>
+          </div>
+          <div class="df-anim-msg" id="df-anim-msg">感應宇宙能量中…</div>
+          <div class="df-progress-track">
+            <div class="df-progress-bar" id="df-progress-bar"></div>
+          </div>
+        </div><!-- /df-anim-panel -->
+
+        <!-- 結果面板 -->
+        <div id="df-result" class="df-panel df-result-panel" style="display:none"></div>
+
+      </div><!-- /daily-fortune -->
+
+      <div class="divider" style="margin:2rem 0 2.5rem">✦ ✦ ✦</div>
+
       <!-- 老師介紹 -->
       <div class="teacher-wrap">
         <div class="teacher-avatar-wrap">

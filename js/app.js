@@ -1962,3 +1962,384 @@ document.addEventListener('click', e => {
     setTimeout(generateCombinedReading, 100);
   }
 });
+
+// ══════════════════════════════════════════════
+//  本日運勢分析
+// ══════════════════════════════════════════════
+
+const DF = { num: null, year: 1990, month: 1, day: 1, gender: 'M' };
+
+// ── 資料庫 ──
+const DF_COLORS = [
+  { name: '神秘紫',   hex: '#8b5cf6', tip: '象徵直覺與靈性能量，今日穿搭或配件帶紫色，感知力與洞察力加倍' },
+  { name: '皇家藍',   hex: '#1d4ed8', tip: '代表沉穩與專注，有助於重要決策、溝通談判，保持清醒頭腦' },
+  { name: '翡翠綠',   hex: '#059669', tip: '生機與財富之色，面試、簽約、拓展人脈皆宜，帶來好運' },
+  { name: '琥珀金',   hex: '#d97706', tip: '象徵魅力與吸引力，今日出席社交場合格外光彩照人' },
+  { name: '珊瑚橙',   hex: '#ea580c', tip: '活力與創意的泉源，適合需要突破與嘗試新事物的場合' },
+  { name: '胭脂紅',   hex: '#b91c1c', tip: '熱情與勇氣的顏色，今日適合主動出擊，把握主導權' },
+  { name: '月光白',   hex: '#94a3b8', tip: '純淨與直覺之色，今日保持清醒思路，一切自然通暢' },
+  { name: '煙燻金',   hex: '#b45309', tip: '貴氣與成就，今日在財務和事業上散發獨特光芒' },
+  { name: '湖水藍',   hex: '#0891b2', tip: '流動與靈感之色，創作、學習、溝通事半功倍，思維流暢' },
+  { name: '薰衣草紫', hex: '#7c3aed', tip: '夢想與靈性能量湧現，今日直覺特別準確，信任直覺' },
+  { name: '桃粉色',   hex: '#db2777', tip: '溫柔與緣分，今日感情與人際互動格外順暢，好事近了' },
+  { name: '深靛藍',   hex: '#3730a3', tip: '沉穩與智慧，適合深度思考與獨自決斷，迴避無謂紛爭' },
+];
+
+const DF_DIRS     = ['正東', '東南', '正南', '西南', '正西', '西北', '正北', '東北'];
+const DF_DIR_TIPS = [
+  '旭日升起的方向，象徵新生與啟程，今日往東行動，機遇隨之展開',
+  '融合南方熱情與東方生機，社交合作、拓展人脈的最佳方位',
+  '代表強烈的陽光能量，展示自我、提高能見度的方向',
+  '財富積累與穩定守成的方位，今日涉及金錢的行動可朝此方',
+  '收穫與圓滿之方，今日適合完成既有計畫或進行總結',
+  '智慧與深思的方位，今日靜心思考或做重要獨斷之決定',
+  '平靜積累之方，今日修養生息、蓄積能量，靜待轉機',
+  '貴人方位，今日往東北行動，往往意外遇見助力或機緣',
+];
+
+const DF_WEALTH_TXT = [
+  '財運較弱，務必保守理財，謹防衝動消費或被人誘導，現有資產管好便是上策。',
+  '財運稍弱，不宜大額投資或借貸，日常支出控制得宜，靜待財運回升。',
+  '財運平穩，收支基本均衡，量入為出，踏實積累，比追求暴利更為穩妥。',
+  '財運順暢，收入有增長跡象，小額投資或商業談判可積極推進，機遇出現時果敢把握。',
+  '財星高照！今日財運極旺，與金錢相關的事務均可大膽推進，意外之財也有降臨的可能。',
+];
+const DF_CAREER_TXT = [
+  '工作運偏弱，容易遭遇誤解或溝通障礙，低調行事、以退為進，不宜正面衝突。',
+  '工作運稍受阻，任務推進可能遭遇干擾，保持耐心，把手頭工作做紮實，等待時機。',
+  '工作運普通，按部就班即可，適合例行事務，不宜輕率做重大決定。',
+  '工作運佳，思路清晰、效率高，今日適合處理複雜任務、開展重要會議或向上級表達想法。',
+  '事業運勢全開！展現才華的絕佳時機，主動爭取能見度，上司與同事對你格外欣賞。',
+];
+
+const DF_NUM_CORE = [
+  '',
+  '你選擇的數字帶有「1」的能量——領袖、開創、獨立。今日你天生的掌舵能力被啟動，主動出擊，由你來引領方向。',
+  '「2」的頻率共鳴著合作與直覺。今日聆聽內心深處細微的聲音，對人對事的第一感覺往往是正確的，信任它。',
+  '「3」點亮了創意之火——今日靈感豐沛、表達力強，需要溝通、說服或創作的事情，今日是最佳時機。',
+  '「4」建構了穩固的地基。今日不適合好高騖遠，把計畫落地執行、把細節確認清楚，比宏大的構想更有價值。',
+  '「5」帶來變動的風。今日可能有意想不到的轉折或機遇出現，保持靈活與開放，不要死守既定計畫。',
+  '「6」振動著愛與責任的頻率。今日人際關係尤為重要，好好照顧身邊的人，能量自然回流，好事也隨之而來。',
+  '「7」開啟了靈性之門。今日你的直覺比平時敏銳，適合深度思考、自我反省，或做出需要洞察力的重要決定。',
+  '「8」啟動了豐盛的迴路。今日財運與事業之間有強烈加成效應，任何需要影響力或資源整合的事情，主動推進。',
+  '「9」代表圓滿與完成。今日適合為某段旅程做好收尾——結清舊帳、釋放過去，為新的篇章清出空間。',
+];
+
+const DF_ZODIAC_NM  = ['鼠','牛','虎','兔','龍','蛇','馬','羊','猴','雞','狗','豬'];
+const DF_ZODIAC_TIP = [
+  '屬鼠：今日機智靈活，善於察言觀色，細節中藏著不可錯過的機遇。',
+  '屬牛：今日以耐力見長，穩打穩紮，踏實努力自有豐厚回報。',
+  '屬虎：今日氣勢旺盛，主動出擊有利，但決策前先深呼吸，避免衝動。',
+  '屬兔：今日人緣極佳，適合社交與談判，一切以和為貴，柔能克剛。',
+  '屬龍：今日貴人運旺，保持積極主動，機遇往往從意想不到的地方降臨。',
+  '屬蛇：今日直覺特別準，閉上眼靜靜思考，答案自然浮現，信任自己。',
+  '屬馬：今日行動力強，適合開展新計畫，但做決定前讓自己稍微冷靜一秒。',
+  '屬羊：今日藝術與美感運佳，人際溫和融洽，適合創作或需要審美的工作。',
+  '屬猴：今日思維敏捷，多線作戰游刃有餘，把才智用在刀口上事半功倍。',
+  '屬雞：今日一絲不苟的態度帶來實質成果，重視細節，完美執行最有力。',
+  '屬狗：今日忠誠可信的特質被人看見，合作運佳，貴人願意伸出援手。',
+  '屬豬：今日整體運勢溫和順暢，財運有小確幸，享受過程比追求結果更重要。',
+];
+
+// ── 工具函數 ──
+function dfHash(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+  return Math.abs(h);
+}
+function dfRNG(seed) {
+  let s = seed >>> 0;
+  return () => { s = Math.imul(1664525, s) + 1013904223 | 0; return (s >>> 0) / 4294967296; };
+}
+function dfReduce(n) {
+  while (n > 9) n = String(n).split('').reduce((a, b) => a + +b, 0);
+  return n;
+}
+function dfStars(n, tot = 5) { return '★'.repeat(n) + '☆'.repeat(tot - n); }
+
+// ── 核心計算 ──
+function dfCalculate() {
+  const today    = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
+  const rand     = dfRNG(dfHash(`${DF.num}|${DF.year}|${DF.month}|${DF.day}|${DF.gender}|${todayStr}`));
+
+  const numCore  = dfReduce(DF.num);
+  const zodiacIdx = ((DF.year - 4) % 12 + 12) % 12;
+  const wd       = today.getDay(); // 0=日
+
+  // 各項基礎分 (1-5)
+  const r = Array.from({ length: 8 }, rand);
+  const numMod  = [1,3,5,8].includes(numCore) ? .5 : [4,7].includes(numCore) ? -.5 : 0;
+  const wdMod   = (wd === 0 || wd === 6) ? .4 : 0;
+  const genMod  = (DF.gender === 'F' && wd === 5) || (DF.gender === 'M' && wd === 2) ? .3 : 0;
+
+  const wealthScore = Math.max(1, Math.min(5, Math.round(r[0] * 4.2 + 0.9 + numMod + wdMod)));
+  const careerScore = Math.max(1, Math.min(5, Math.round(r[1] * 4.2 + 0.9 + numMod + genMod)));
+  const luckyScore  = Math.max(1, Math.min(5, Math.round((wealthScore + careerScore) / 2 + r[2] * 1.4 - .2)));
+  const colorIdx    = Math.floor(r[3] * DF_COLORS.length);
+  const dirIdx      = Math.floor(r[4] * 8);
+
+  const WD_CH  = ['日','一','二','三','四','五','六'];
+  const MON_CH = ['一','二','三','四','五','六','七','八','九','十','十一','十二'];
+  const dateStr = `${today.getFullYear()} 年 ${MON_CH[today.getMonth()]} 月 ${today.getDate()} 日（星期${WD_CH[wd]}）`;
+
+  return { numCore, zodiacIdx, wealthScore, careerScore, luckyScore,
+           colorIdx, dirIdx, dateStr, weekday: wd };
+}
+
+// ── UI ──
+function dfUpdateNum(val) {
+  DF.num = +val;
+  const pct = ((+val - 1) / 99 * 100).toFixed(1) + '%';
+  const sl = document.getElementById('df-slider');
+  if (sl) { sl.value = val; sl.style.setProperty('--df-pct', pct); }
+  const el = document.getElementById('df-orb-num');
+  if (!el) return;
+  el.textContent = val;
+  el.classList.remove('df-num-flash');
+  void el.offsetWidth;
+  el.classList.add('df-num-flash');
+  setTimeout(() => el.classList.remove('df-num-flash'), 300);
+}
+
+function dfAdjust(delta) {
+  const cur = DF.num || 50;
+  dfUpdateNum(Math.max(1, Math.min(100, cur + delta)));
+}
+
+function dfSetGender(g) {
+  DF.gender = g;
+  document.querySelectorAll('.df-gender-btn').forEach(b => b.classList.toggle('active', b.dataset.g === g));
+}
+
+function dfOnChange(which) {
+  if (which !== 'd') dfUpdateDays();
+  DF.year  = +document.getElementById('df-year').value;
+  DF.month = +document.getElementById('df-month').value;
+  DF.day   = +document.getElementById('df-day').value;
+}
+
+function dfUpdateDays() {
+  const y = +document.getElementById('df-year').value  || 1990;
+  const m = +document.getElementById('df-month').value || 1;
+  const maxD = new Date(y, m, 0).getDate();
+  const del  = document.getElementById('df-day');
+  const prev = +del.value || 1;
+  del.innerHTML = '';
+  for (let d = 1; d <= maxD; d++) del.add(new Option(d + ' 日', d));
+  del.value = Math.min(prev, maxD);
+}
+
+function dfInitSelects() {
+  const yel = document.getElementById('df-year');
+  if (!yel || yel.options.length > 0) return;
+  const cur = new Date().getFullYear();
+  for (let y = cur - 10; y >= 1930; y--) yel.add(new Option(y + ' 年', y));
+  yel.value = '1990'; DF.year = 1990;
+
+  const mel   = document.getElementById('df-month');
+  const MNAME = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+  MNAME.forEach((m, i) => mel.add(new Option(m, i + 1)));
+  mel.value = '1'; DF.month = 1;
+
+  dfUpdateDays();
+  document.getElementById('df-day').value = '1'; DF.day = 1;
+}
+
+// ── 占卜開始 ──
+function startDailyFortune() {
+  if (!DF.num) { alert('請先移動滑桿，用直覺選擇一個數字（1–100）'); return; }
+  dfOnChange('y');
+  if (!DF.year || !DF.month || !DF.day) { alert('請填寫完整的出生日期'); return; }
+  const data = dfCalculate();
+  dfAnimate(data);
+}
+
+// ── 動畫 ──
+function dfAnimate(data) {
+  const inp  = document.getElementById('df-input');
+  const anim = document.getElementById('df-anim');
+
+  inp.style.opacity = '0'; inp.style.transform = 'translateY(-12px)';
+  setTimeout(() => {
+    inp.style.display = 'none';
+    anim.style.display = 'flex'; anim.style.opacity = '0';
+    requestAnimationFrame(() => {
+      anim.style.transition = 'opacity .5s';
+      anim.style.opacity = '1';
+    });
+
+    // 飄動星星
+    const fc = document.getElementById('df-float-stars');
+    fc.innerHTML = '';
+    const SC = ['✦','✧','⋆','★','·','⭑','✨'];
+    for (let i = 0; i < 55; i++) {
+      const s = document.createElement('div');
+      s.className = 'df-float-star';
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;`
+        + `--dur:${(2+Math.random()*2.5).toFixed(2)}s;--delay:${(Math.random()*2.5).toFixed(2)}s;`
+        + `--op:${(.15+Math.random()*.5).toFixed(2)};font-size:${7+Math.random()*10}px;`;
+      s.textContent = SC[i % SC.length];
+      fc.appendChild(s);
+    }
+
+    // 水晶球計數器
+    const cn = document.getElementById('df-crystal-num'); cn.textContent = '?';
+    let cur = 0; const target = DF.num;
+    const step = Math.max(1, Math.ceil(target / 22));
+    const ctr  = setInterval(() => {
+      cur = Math.min(cur + step, target);
+      cn.textContent = cur;
+      if (cur >= target) clearInterval(ctr);
+    }, 90);
+
+    // 訊息輪播
+    const MSGS = ['感應宇宙能量中…','解讀你的生辰密碼…','測算今日命盤走向…',
+                  '編織命運軌跡…','整合今日運勢能量…','✦ 運勢報告完成 ✦'];
+    let mi = 0;
+    const mel = document.getElementById('df-anim-msg');
+    const mt  = setInterval(() => {
+      mi++; if (mi >= MSGS.length) { clearInterval(mt); return; }
+      mel.classList.add('df-msg-fade');
+      setTimeout(() => { mel.textContent = MSGS[mi]; mel.classList.remove('df-msg-fade'); }, 220);
+    }, 600);
+
+    // 進度條
+    const pb = document.getElementById('df-progress-bar');
+    let prog = 0;
+    const pt = setInterval(() => {
+      prog += 100 / 48;
+      pb.style.width = Math.min(prog, 100) + '%';
+      if (prog >= 100) {
+        clearInterval(pt); clearInterval(mt);
+        setTimeout(() => {
+          anim.style.opacity = '0';
+          setTimeout(() => { anim.style.display = 'none'; dfShowResult(data); }, 420);
+        }, 400);
+      }
+    }, 80);
+  }, 320);
+}
+
+// ── 顯示結果 ──
+function dfShowResult(data) {
+  const res = document.getElementById('df-result');
+  res.style.display = 'block'; res.style.opacity = '0';
+  res.innerHTML = dfBuildHTML(data);
+  requestAnimationFrame(() => {
+    res.style.transition = 'opacity .6s'; res.style.opacity = '1';
+    res.querySelectorAll('.df-card').forEach((c, i) => {
+      c.style.cssText = `opacity:0;transform:translateY(22px);transition:opacity .5s ${.15+i*.13}s,transform .5s ${.15+i*.13}s`;
+      requestAnimationFrame(() => { c.style.opacity = '1'; c.style.transform = 'translateY(0)'; });
+    });
+  });
+}
+
+function dfBuildHTML(d) {
+  const { numCore, zodiacIdx, wealthScore, careerScore, luckyScore, colorIdx, dirIdx, dateStr } = d;
+  const color = DF_COLORS[colorIdx];
+  const dir   = DF_DIRS[dirIdx];
+  const zodiac = DF_ZODIAC_NM[zodiacIdx];
+
+  // 綜合解讀文字（5段）
+  const energyT = [
+    '今日整體能量受到壓制，宜靜不宜動，充電蓄勢，靜待時機轉換，保持心態平穩是今日最大的智慧。',
+    '今日能量略顯低迷，建議放慢步調，把精力放在整理思路與修復關係上，積蓄的力量將在不遠處爆發。',
+    '今日能量平穩流動，運勢起伏不大，踏實前行、保持穩定節奏即可，積累才是今日的主旋律。',
+    '今日宇宙能量順向運轉，各方面較為順遂，適合積極行動，把握眼前的機遇，你的努力事半功倍。',
+    '今日宇宙能量高度共振，命運之輪強力轉動！展現自我、推進重要計畫的黃金時機，全力以赴！',
+  ];
+  const balT = (wealthScore - careerScore >= 2)
+    ? '今日財運明顯優於工作運，可關注副業或被動收入的機遇，正職上保持穩定、不出風頭即可。'
+    : (careerScore - wealthScore >= 2)
+    ? '工作面有突破跡象，但財務方面宜保守，以事業上的好表現帶動長期財富積累，厚積薄發。'
+    : (wealthScore >= 4 && careerScore >= 4)
+    ? '財運與事業雙旺，今日是難得的全面開花日，重要決策可一次推進，不必顧慮太多。'
+    : (wealthScore <= 2 && careerScore <= 2)
+    ? '今日各方面能量稍弱，最佳策略是修養生息、整理人際關係，厚積薄發，下一個高峰就在不遠處。'
+    : '財運與工作運均在穩定水準，按部就班、全面推進，今日不偏廢任何一方為上策。';
+
+  const parts = [
+    energyT[luckyScore - 1],
+    DF_NUM_CORE[numCore] || '',
+    DF_ZODIAC_TIP[zodiacIdx],
+    balT,
+    `幸運方位「${dir}」——${DF_DIR_TIPS[dirIdx]}。今日出行、辦公或重要約見，可以此方位為參考，讓運勢加分。`,
+  ].filter(Boolean);
+
+  const colorStyle = `background:${color.hex}; border: 1px solid ${color.hex}88;`;
+
+  return `
+<div class="df-res-header">
+  <div class="df-res-date">${dateStr}</div>
+  <div class="df-res-title">✦ 今日運勢報告 ✦</div>
+  <div class="df-res-meta">數字 <strong>${DF.num}</strong>（核心數 ${numCore}）・${DF.gender === 'M' ? '男' : '女'}・屬${zodiac}</div>
+  <div class="df-res-stars">
+    <span class="df-stars-label">幸運指數</span>
+    <span class="df-stars-val">${dfStars(luckyScore)}</span>
+  </div>
+</div>
+
+<div class="df-cards-grid">
+  <div class="df-card df-card-color">
+    <div class="df-card-icon" style="${colorStyle}">✦</div>
+    <div class="df-card-body">
+      <div class="df-card-label">本日幸運色</div>
+      <div class="df-card-value">${color.name}</div>
+      <div class="df-card-tip">${color.tip}</div>
+    </div>
+  </div>
+  <div class="df-card df-card-dir">
+    <div class="df-card-icon">🧭</div>
+    <div class="df-card-body">
+      <div class="df-card-label">幸運方位</div>
+      <div class="df-card-value">${dir}</div>
+      <div class="df-card-tip">${DF_DIR_TIPS[dirIdx]}</div>
+    </div>
+  </div>
+  <div class="df-card df-card-wealth">
+    <div class="df-card-icon">💰</div>
+    <div class="df-card-body">
+      <div class="df-card-label">財運</div>
+      <div class="df-card-stars">${dfStars(wealthScore)}</div>
+      <div class="df-card-tip">${DF_WEALTH_TXT[wealthScore - 1]}</div>
+    </div>
+  </div>
+  <div class="df-card df-card-career">
+    <div class="df-card-icon">💼</div>
+    <div class="df-card-body">
+      <div class="df-card-label">工作運</div>
+      <div class="df-card-stars">${dfStars(careerScore)}</div>
+      <div class="df-card-tip">${DF_CAREER_TXT[careerScore - 1]}</div>
+    </div>
+  </div>
+</div>
+
+<div class="df-card df-overall-card">
+  <div class="df-overall-title">✦ 綜合運勢解讀 ✦</div>
+  <div class="df-overall-text">
+    ${parts.map(p => `<p>${p}</p>`).join('')}
+  </div>
+</div>
+
+<div class="df-res-actions">
+  <button class="df-redo-btn" onclick="dfReset()">↺ 重新占卜</button>
+  <button class="btn" onclick="showSection('question')" style="margin-top:.3rem">🔮 深度塔羅 × 紫微解讀</button>
+</div>`;
+}
+
+// ── 重置 ──
+function dfReset() {
+  const res = document.getElementById('df-result');
+  const inp = document.getElementById('df-input');
+  res.style.opacity = '0';
+  setTimeout(() => {
+    res.style.display = 'none'; res.innerHTML = '';
+    inp.style.display = 'block'; inp.style.opacity = '0'; inp.style.transform = 'translateY(-12px)';
+    inp.style.transition = 'opacity .4s, transform .4s';
+    requestAnimationFrame(() => { inp.style.opacity = '1'; inp.style.transform = 'translateY(0)'; });
+  }, 320);
+}
+
+// 頁面載入後初始化下拉選單
+document.addEventListener('DOMContentLoaded', dfInitSelects);

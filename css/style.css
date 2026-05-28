@@ -1472,6 +1472,302 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
   .result-q-text    { font-size: .92rem; }
 }
 
+/* ══════════════════════════════════════════
+   本日運勢分析
+   ══════════════════════════════════════════ */
+
+/* ── 外框 ── */
+.df-wrap {
+  margin-bottom: .5rem;
+}
+.df-panel {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── 輸入面板 ── */
+.df-input-panel {
+  background: linear-gradient(160deg, #0c0a22 0%, #110a2a 50%, #080a20 100%);
+  border: 1px solid rgba(168,85,247,.3);
+  box-shadow: 0 0 40px rgba(120,50,200,.15);
+  padding: 2.2rem 2rem 2rem;
+  transition: opacity .35s, transform .35s;
+}
+.df-header { text-align: center; margin-bottom: 1.8rem; }
+.df-crown  { color: var(--gold-l); font-size: .85rem; letter-spacing: .5rem; margin-bottom: .6rem; }
+.df-title  { font-size: 1.6rem; font-weight: 700;
+  background: linear-gradient(135deg, #e9d5ff 0%, #c4b5fd 40%, var(--gold-l) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: .6rem;
+}
+.df-subtitle { color: var(--text-dim); font-size: .9rem; line-height: 1.7; }
+
+/* 數字選擇 */
+.df-num-section { text-align: center; margin-bottom: 1.6rem; }
+.df-section-label { color: var(--text-dim); font-size: .82rem; letter-spacing: .04rem; margin-bottom: 1.2rem; }
+.df-num-row { display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin-bottom: 1.2rem; }
+
+.df-num-arrow {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(168,85,247,.15); border: 1px solid rgba(168,85,247,.4);
+  color: #c4b5fd; font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.df-num-arrow:hover { background: rgba(168,85,247,.3); transform: scale(1.1); }
+
+/* 水晶球（輸入） */
+.df-orb {
+  width: 110px; height: 110px; border-radius: 50%; position: relative;
+  background: radial-gradient(circle at 35% 32%, rgba(200,165,255,.25) 0%, rgba(100,50,200,.5) 45%, rgba(8,4,25,.9) 100%);
+  box-shadow: 0 0 25px rgba(168,85,247,.4), inset 0 0 15px rgba(255,255,255,.07);
+  display: flex; align-items: center; justify-content: center;
+}
+.df-orb-ring {
+  position: absolute; inset: -4px; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0%, #a855f7 30%, #7c3aed 50%, transparent 60%, #c4b5fd 80%, transparent 100%);
+  animation: df-ring 4s linear infinite;
+  -webkit-mask: radial-gradient(circle, transparent 50px, black 52px);
+  mask: radial-gradient(circle, transparent 50px, black 52px);
+}
+.df-orb-inner {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+#df-orb-num {
+  font-size: 2rem; font-weight: 700; color: #e9d5ff;
+  text-shadow: 0 0 12px rgba(200,160,255,.8);
+  transition: all .25s;
+}
+#df-orb-num.df-num-flash {
+  transform: scale(1.25); color: #fff;
+  text-shadow: 0 0 20px rgba(220,180,255,1);
+}
+
+/* 滑桿 */
+.df-slider-row { display: flex; align-items: center; gap: .7rem; }
+.df-s-tip { color: var(--text-dim); font-size: .78rem; min-width: 1.5rem; text-align: center; }
+.df-slider {
+  flex: 1; -webkit-appearance: none; appearance: none;
+  height: 4px; border-radius: 2px; outline: none;
+  background: linear-gradient(to right, #7c3aed var(--df-pct, 0%), rgba(255,255,255,.18) var(--df-pct, 0%));
+}
+.df-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d8b4fe, #7c3aed);
+  box-shadow: 0 0 8px rgba(168,85,247,.7); cursor: pointer; transition: transform .2s;
+}
+.df-slider::-webkit-slider-thumb:hover { transform: scale(1.25); }
+.df-slider::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%; border: none;
+  background: radial-gradient(circle at 35% 35%, #d8b4fe, #7c3aed);
+  box-shadow: 0 0 8px rgba(168,85,247,.7); cursor: pointer;
+}
+
+/* 生日+性別 */
+.df-info-row { display: flex; gap: 1.5rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
+.df-field-group { flex: 1; min-width: 180px; }
+.df-field-label { color: var(--text-dim); font-size: .8rem; margin-bottom: .55rem; }
+.df-birth-selects { display: flex; gap: .5rem; }
+.df-sel {
+  flex: 1; padding: .5rem .4rem; border-radius: 8px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(168,85,247,.3);
+  color: var(--text); font-size: .85rem; outline: none; cursor: pointer;
+  transition: border-color .2s;
+}
+.df-sel:hover, .df-sel:focus { border-color: rgba(168,85,247,.7); }
+.df-sel option { background: #110a2a; }
+
+.df-gender-wrap { display: flex; gap: .6rem; }
+.df-gender-btn {
+  flex: 1; padding: .5rem; border-radius: 8px; font-size: .9rem; cursor: pointer;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(168,85,247,.25); color: var(--text-dim);
+  transition: all .2s;
+}
+.df-gender-btn.active {
+  background: rgba(124,58,237,.25); border-color: #a855f7; color: #e9d5ff;
+  box-shadow: 0 0 10px rgba(168,85,247,.3);
+}
+
+/* 開始按鈕 */
+.df-start-btn {
+  width: 100%; padding: .95rem; border-radius: 40px; cursor: pointer;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #7c3aed 100%);
+  background-size: 200% 100%;
+  border: none; color: #fff; font-size: 1.05rem; font-weight: 700;
+  letter-spacing: .1rem; transition: all .35s;
+  box-shadow: 0 4px 20px rgba(124,58,237,.4);
+}
+.df-start-btn:hover {
+  background-position: right center;
+  box-shadow: 0 6px 30px rgba(168,85,247,.6);
+  transform: translateY(-1px);
+}
+
+/* ── 動畫面板 ── */
+.df-anim-panel {
+  background: radial-gradient(ellipse at 50% 40%, #130a2e 0%, #060613 70%);
+  border: 1px solid rgba(168,85,247,.25);
+  min-height: 340px; padding: 2.5rem 1.5rem 2rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.4rem;
+  transition: opacity .4s;
+}
+
+/* 浮動星星 */
+.df-float-stars { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.df-float-star {
+  position: absolute; color: var(--gold-l);
+  animation: df-float var(--dur, 2.5s) ease-in-out infinite var(--delay, 0s);
+}
+@keyframes df-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: var(--op, .4); }
+  50%       { transform: translateY(-18px) scale(1.15); opacity: 1; }
+}
+
+/* 大水晶球 */
+.df-crystal-wrap { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
+.df-crystal-ring-outer {
+  position: absolute; inset: -6px; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0%, #a855f7 25%, #e9d5ff 45%, transparent 55%, #7c3aed 75%, transparent 85%);
+  animation: df-ring 3s linear infinite;
+  -webkit-mask: radial-gradient(circle, transparent 84px, black 86px 100%);
+  mask:          radial-gradient(circle, transparent 84px, black 86px 100%);
+}
+.df-crystal {
+  width: 180px; height: 180px; border-radius: 50%; position: relative;
+  background: radial-gradient(circle at 35% 30%, rgba(220,180,255,.35) 0%, rgba(100,50,210,.6) 40%, rgba(8,4,30,.95) 100%);
+  box-shadow: 0 0 50px rgba(168,85,247,.5), inset 0 0 30px rgba(255,255,255,.06);
+  display: flex; align-items: center; justify-content: center;
+  animation: df-pulse 2.2s ease-in-out infinite;
+}
+.df-crystal-shimmer {
+  position: absolute; top: 20%; left: 25%; width: 28%; height: 22%;
+  border-radius: 50%; background: rgba(255,255,255,.18);
+  transform: rotate(-30deg); filter: blur(4px);
+}
+.df-crystal-num {
+  font-size: 3.2rem; font-weight: 800; color: #f3e8ff; position: relative; z-index: 1;
+  text-shadow: 0 0 20px rgba(220,180,255,.9), 0 0 40px rgba(168,85,247,.6);
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+}
+
+@keyframes df-ring  { to { transform: rotate(360deg); } }
+@keyframes df-pulse {
+  0%, 100% { box-shadow: 0 0 50px rgba(168,85,247,.5), inset 0 0 30px rgba(255,255,255,.06); }
+  50%       { box-shadow: 0 0 80px rgba(168,85,247,.8), 0 0 20px rgba(200,150,255,.3), inset 0 0 40px rgba(255,255,255,.1); }
+}
+
+/* 動畫訊息 + 進度條 */
+.df-anim-msg {
+  color: #c4b5fd; font-size: .95rem; letter-spacing: .06rem;
+  transition: opacity .25s; text-align: center;
+}
+.df-anim-msg.df-msg-fade { opacity: 0; }
+.df-progress-track {
+  width: min(280px, 80%); height: 3px; border-radius: 2px;
+  background: rgba(255,255,255,.1);
+}
+.df-progress-bar {
+  height: 100%; border-radius: 2px; width: 0;
+  background: linear-gradient(90deg, #7c3aed, #a855f7, #e9d5ff);
+  box-shadow: 0 0 8px rgba(168,85,247,.7);
+  transition: width .08s linear;
+}
+
+/* ── 結果面板 ── */
+.df-result-panel {
+  background: linear-gradient(160deg, #0c0a22, #0a0818);
+  border: 1px solid rgba(201,160,42,.25);
+  padding: 1.8rem 1.6rem 2rem;
+  transition: opacity .5s;
+}
+.df-res-header { text-align: center; margin-bottom: 1.6rem; }
+.df-res-date  { color: var(--text-dim); font-size: .82rem; margin-bottom: .4rem; }
+.df-res-title {
+  font-size: 1.35rem; font-weight: 700; margin-bottom: .4rem;
+  background: linear-gradient(135deg, var(--gold-l), #e9d5ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.df-res-meta  { color: var(--text-dim); font-size: .82rem; margin-bottom: .9rem; }
+.df-res-stars { display: inline-flex; align-items: center; gap: .5rem;
+  background: rgba(201,160,42,.1); border: 1px solid rgba(201,160,42,.3);
+  padding: .35rem .9rem; border-radius: 20px;
+}
+.df-stars-label { color: var(--text-dim); font-size: .78rem; }
+.df-stars-val   { color: var(--gold-l); font-size: 1.1rem; letter-spacing: .05rem; }
+
+/* 四格卡片 */
+.df-cards-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: .9rem; margin-bottom: 1rem;
+}
+.df-card {
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px; padding: 1rem .9rem;
+  display: flex; align-items: flex-start; gap: .8rem;
+  transition: opacity .5s, transform .5s;
+}
+.df-card-icon {
+  width: 42px; height: 42px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+}
+.df-card-color .df-card-icon { font-size: .8rem; color: rgba(255,255,255,.9); }
+.df-card-dir    .df-card-icon { background: rgba(34,211,238,.15); border: 1px solid rgba(34,211,238,.3); }
+.df-card-wealth .df-card-icon { background: rgba(250,204,21,.15);  border: 1px solid rgba(250,204,21,.3); }
+.df-card-career .df-card-icon { background: rgba(99,102,241,.15);  border: 1px solid rgba(99,102,241,.3); }
+
+.df-card-body   { flex: 1; min-width: 0; }
+.df-card-label  { color: var(--text-dim); font-size: .72rem; margin-bottom: .2rem; }
+.df-card-value  { color: var(--text); font-size: .95rem; font-weight: 600; margin-bottom: .25rem; }
+.df-card-stars  { color: var(--gold-l); font-size: 1rem; margin-bottom: .25rem; }
+.df-card-tip    { color: var(--text-dim); font-size: .76rem; line-height: 1.55; }
+
+/* 綜合解讀 */
+.df-overall-card {
+  flex-direction: column; align-items: stretch; gap: .7rem;
+  margin-bottom: 1.3rem; padding: 1.2rem;
+  border-color: rgba(201,160,42,.2);
+  background: rgba(201,160,42,.04);
+}
+.df-overall-title {
+  color: var(--gold-l); font-size: .88rem; letter-spacing: .08rem;
+  text-align: center; font-weight: 600;
+}
+.df-overall-text p {
+  color: #c4c4d8; font-size: .88rem; line-height: 1.85;
+  margin-bottom: .75rem;
+}
+.df-overall-text p:last-child { margin-bottom: 0; }
+
+/* 底部按鈕 */
+.df-res-actions {
+  display: flex; flex-direction: column; align-items: center; gap: .6rem;
+}
+.df-redo-btn {
+  padding: .55rem 1.6rem; border-radius: 20px; cursor: pointer;
+  background: transparent; border: 1px solid rgba(168,85,247,.4);
+  color: #c4b5fd; font-size: .88rem; transition: all .2s;
+}
+.df-redo-btn:hover { background: rgba(168,85,247,.15); border-color: #a855f7; }
+
+/* ── 響應式 ── */
+@media (max-width: 600px) {
+  .df-input-panel  { padding: 1.6rem 1.1rem 1.4rem; }
+  .df-info-row     { flex-direction: column; gap: 1rem; }
+  .df-field-group  { min-width: unset; }
+  .df-birth-selects { gap: .35rem; }
+  .df-cards-grid   { grid-template-columns: 1fr; }
+  .df-crystal-wrap { width: 150px; height: 150px; }
+  .df-crystal      { width: 150px; height: 150px; }
+  .df-crystal-num  { font-size: 2.6rem; }
+  .df-crystal-ring-outer {
+    -webkit-mask: radial-gradient(circle, transparent 70px, black 72px 100%);
+    mask:          radial-gradient(circle, transparent 70px, black 72px 100%);
+  }
+}
+
 /* ── 超小手機（≤ 360px）── */
 @media (max-width: 360px) {
   .home-features { grid-template-columns: 1fr; }
