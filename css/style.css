@@ -1276,6 +1276,104 @@ main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
   border-top: 1px solid rgba(201,160,42,.15);
 }
 
+/* ── 進階命盤解讀（adv-reading）── */
+.adv-reading {
+  margin-top: 2rem;
+  border-top: 2px solid var(--border-b);
+  padding-top: 1.5rem;
+}
+.adv-section {
+  margin-bottom: 1.8rem;
+  padding: 1.2rem 1.4rem;
+  background: linear-gradient(135deg, rgba(13,13,34,.95) 0%, rgba(26,26,62,.6) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  transition: border-color .2s;
+}
+.adv-section:hover { border-color: var(--border-b); }
+.adv-verdict {
+  background: linear-gradient(135deg, rgba(124,58,237,.18) 0%, rgba(34,211,238,.08) 100%);
+  border-color: rgba(124,58,237,.45);
+}
+.adv-final {
+  background: linear-gradient(135deg, rgba(201,160,42,.12) 0%, rgba(232,192,64,.06) 100%);
+  border-color: rgba(201,160,42,.45);
+}
+.adv-label {
+  font-size: .82rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: .9rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid rgba(201,160,42,.2);
+}
+.verdict-line {
+  font-size: 1rem !important;
+  color: var(--purple-l) !important;
+  font-weight: 600;
+  text-indent: 0 !important;
+  line-height: 1.8 !important;
+}
+.adv-highlight {
+  color: var(--gold-l) !important;
+  font-style: italic;
+  text-indent: 0 !important;
+  padding: .4rem .8rem;
+  border-left: 3px solid var(--gold);
+  margin-left: .5rem;
+}
+.adv-warn {
+  color: #ffb347 !important;
+  font-style: italic;
+  text-indent: 0 !important;
+  padding: .4rem .8rem;
+  border-left: 3px solid #ff8c42;
+  margin-left: .5rem;
+}
+.adv-path {
+  margin-bottom: 1rem;
+  padding: .8rem 1rem;
+  background: rgba(124,58,237,.08);
+  border-radius: var(--r);
+  border-left: 3px solid var(--purple);
+}
+.adv-path:last-child { margin-bottom: 0; }
+.adv-path-label {
+  display: block;
+  font-size: .83rem;
+  font-weight: 700;
+  color: var(--purple-l);
+  margin-bottom: .4rem;
+  letter-spacing: .04em;
+}
+.adv-path .narrative-para {
+  margin-bottom: 0;
+  text-indent: 0 !important;
+  color: var(--text-dim);
+}
+.adv-risk {
+  text-indent: 0 !important;
+  padding-left: .8rem;
+  border-left: 2px solid rgba(255,180,70,.3);
+  margin-left: .3rem;
+}
+.adv-risk-label {
+  font-weight: 600;
+  color: #ffb347;
+  margin-right: .4em;
+}
+.adv-warm {
+  color: var(--gold-l) !important;
+  font-style: italic !important;
+  text-indent: 0 !important;
+  text-align: center;
+  font-size: .9rem !important;
+  margin-top: 1rem;
+  padding-top: .8rem;
+  border-top: 1px solid rgba(201,160,42,.2);
+}
+
 /* ── 未來半年運勢 ── */
 .future-fortune-wrap { padding: .2rem 0; }
 .fortune-year-label {
