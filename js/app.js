@@ -144,7 +144,7 @@ async function startShuffle() {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
-  _shuffledDeck = deck.map(c => ({ ...c, reversed: Math.random() < 0.3 }));
+  _shuffledDeck = deck.map(c => ({ ...c, reversed: Math.random() < 0.5 }));
 
   // 確保牌堆畫面存在
   if (!document.getElementById('deck-stack')) showDeckIdle();
@@ -825,7 +825,7 @@ async function newFlowShuffle() {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
   }
-  FLOW.deck = deck.map(c => ({ ...c, isRev: Math.random() < 0.3 }));
+  FLOW.deck = deck.map(c => ({ ...c, isRev: Math.random() < 0.5 }));
   FLOW.picked = []; FLOW.pickedIdx = [];
   const stack = document.getElementById('ndeck-stack');
   if (stack) {
